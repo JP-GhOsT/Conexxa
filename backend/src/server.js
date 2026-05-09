@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 require("./models/userModel");
+require("./models/groupModel");
 
 const authRoutes = require("./routes/authRoutes");
 
