@@ -11,9 +11,9 @@ function Register() {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // VALIDAR FORMULÁRIO
   const validateField = (name, value) => {
     let error = "";
 
@@ -23,19 +23,34 @@ function Register() {
 
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
+      if (!value.trim()) {
+        error = "E-mail é obrigatório";
+      } else if (!emailRegex.test(value)) {
         error = "E-mail inválido";
       }
     }
 
     if (name === "senha") {
       const senhaRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-      if (!senhaRegex.test(value)) {
+      if (!value.trim()) {
+        error = "Senha é obrigatória";
+      } else if (!senhaRegex.test(value)) {
         error = "Senha deve ter no mínimo 8 caracteres, 1 letra e 1 número";
       }
     }
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+    return error === "";
+  };
+
+  const validateAll = () => {
+    const fields = ["nome_completo", "email", "senha"];
+    let ok = true;
+    fields.forEach((f) => {
+      const valid = validateField(f, formData[f] ?? "");
+      if (!valid) ok = false;
+    });
+    return ok;
   };
 
   // HANDLE INPUT
@@ -49,29 +64,46 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const hasErrors = Object.values(errors).some((error) => error !== "");
-    if (hasErrors) return;
+    if (!validateAll()) {
+      toast.error("Corrija os erros do formulário antes de enviar.");
+      return;
+    }
 
+    setLoading(true);
     try {
+      // Ajuste a rota abaixo se seu backend usar /api/usuarios/cadastro
       const response = await api.post("/auth/register", formData);
 
-      // Toast de sucesso
-      toast.success("Usuário cadastrado com sucesso!");
+      // Toast de sucesso (usa mensagem do backend se houver)
+      toast.success(response.data.message || "Usuário cadastrado com sucesso!");
 
-      // Redirecionar para página do grupo criado (exemplo)
-      navigate(`/grupos/${response.data.grupoId}`);
-
-      // ou para tela de edição:
-      // navigate(`/grupos/${response.data.grupoId}/editar`);
+      // Backend sugerido retorna userId; ajuste se o seu retornar outro campo
+      const userId = response.data.userId || response.data.id || response.data.user?.id;
+      if (userId) {
+        navigate(`/perfil/${userId}`);
+      } else if (response.data.grupoId) {
+        // fallback caso backend retorne grupoId por design
+        navigate(`/grupos/${response.data.grupoId}`);
+      } else {
+        navigate("/");
+      }
 
       // Limpar formulário
       setFormData({ nome_completo: "", email: "", senha: "" });
+      setErrors({});
     } catch (error) {
-      if (error.response && error.response.status === 409) {
-        setErrors({ email: "E-mail já cadastrado" });
+      const status = error.response?.status;
+      const msg = error.response?.data?.message;
+
+      if (status === 409) {
+        setErrors((prev) => ({ ...prev, email: "E-mail já cadastrado" }));
+      } else if (msg) {
+        toast.error(msg);
       } else {
         toast.error("Erro ao cadastrar usuário.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,8 +142,8 @@ function Register() {
         />
         {errors.senha && <p style={styles.error}>{errors.senha}</p>}
 
-        <button style={styles.button} type="submit">
-          Cadastrar
+        <button style={styles.button} type="submit" disabled={loading}>
+          {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
       </form>
     </div>
