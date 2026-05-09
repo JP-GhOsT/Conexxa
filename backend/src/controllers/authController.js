@@ -139,6 +139,95 @@ const register = async (req, res) => {
 
 };
 
+const login = (req, res) => {
+
+  const { email, senha } = req.body;
+
+  // VALIDAR CAMPOS
+  if (!email || !senha) {
+
+    return res.status(400).json({
+      success: false,
+      message: "E-mail e senha são obrigatórios"
+    });
+
+  }
+
+  // BUSCAR USUÁRIO
+  db.get(
+    `
+    SELECT * FROM users
+    WHERE email = ?
+    `,
+    [email],
+    async (err, user) => {
+
+      if (err) {
+
+        return res.status(500).json({
+          success: false,
+          message: "Erro interno"
+        });
+
+      }
+
+      // USUÁRIO NÃO EXISTE
+      if (!user) {
+
+        return res.status(401).json({
+          success: false,
+          message: "E-mail ou senha inválidos"
+        });
+
+      }
+
+      // COMPARAR SENHA
+      const senhaValida =
+        await bcrypt.compare(
+          senha,
+          user.senha_hash
+        );
+
+      // SENHA ERRADA
+      if (!senhaValida) {
+
+        return res.status(401).json({
+          success: false,
+          message: "E-mail ou senha inválidos"
+        });
+
+      }
+
+      // GERAR TOKEN
+      const token = jwt.sign(
+        {
+          id: user.id,
+          email: user.email
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1d"
+        }
+      );
+
+      // RETORNAR
+      return res.json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          nome_completo:
+            user.nome_completo,
+          email: user.email
+        }
+      });
+
+    }
+  );
+
+};
+
 module.exports = {
-  register
+  register,
+  login
 };
