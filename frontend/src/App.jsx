@@ -6,6 +6,7 @@ import {
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import CreateStudyGroup from "./pages/CreateStudyGroup";
 
 function App() {
 
@@ -23,6 +24,12 @@ function App() {
         <Route
           path="/login"
           element={<Login />}
+        />
+
+        {/* CRIAR GRUPO */}
+        <Route
+          path="/groups/create"
+          element={<CreateStudyGroup />}
         />
 
       </Routes>

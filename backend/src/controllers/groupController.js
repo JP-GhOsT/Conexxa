@@ -141,6 +141,32 @@ const createStudyGroup = (req, res) => {
 
 };
 
+const requestJoinGroup = (req, res) => {
+  try {
+    const { groupId } = req.params;
+
+    // TEMPORÁRIO (vai vir do JWT depois)
+    const userId = "temp-user-id";
+
+    return res.status(200).json({
+      success: true,
+      message: "Solicitação de entrada enviada",
+      data: {
+        groupId,
+        userId,
+        status: "PENDING"
+      }
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao solicitar entrada"
+    });
+  }
+};
+
 module.exports = {
-  createStudyGroup
+  createStudyGroup,
+  requestJoinGroup
 };

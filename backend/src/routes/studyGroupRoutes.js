@@ -1,30 +1,17 @@
-exports.createStudyGroup = (req, res) => {
-  const { materia, objetivo, local, limite } = req.body;
-  const errors = {};
+const express = require("express");
+const router = express.Router();
 
-  if (!materia || materia.trim() === "") {
-    errors.materia = "Matéria é obrigatória.";
-  }
-  if (!objetivo || objetivo.trim() === "") {
-    errors.objetivo = "Objetivo é obrigatório.";
-  }
-  if (!local || local.trim() === "") {
-    errors.local = "Local deve ser selecionado.";
-  }
-  if (!limite || limite <= 0) {
-    errors.limite = "Limite deve ser maior que 0.";
-  }
+const groupController = require("../controllers/groupController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-  if (Object.keys(errors).length > 0) {
-    return res.status(400).json({
-      status: "error",
-      errors,
-    });
-  }
+// Criar grupo
+router.post("/study-groups", groupController.createStudyGroup);
 
-  // Aqui você poderia salvar no banco (MongoDB/Postgres)
-  return res.status(201).json({
-    status: "success",
-    message: "Grupo de estudo criado com sucesso!",
-  });
-};
+// Join request
+router.post(
+  "/:groupId/join-request",
+  authMiddleware,
+  groupController.requestJoinGroup
+);
+
+module.exports = router;
