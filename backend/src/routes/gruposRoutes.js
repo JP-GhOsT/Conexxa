@@ -1,7 +1,7 @@
 const express = require("express");
 
-const autenticarToken =
-    require("../middlewares/autenticarToken");
+const authMiddleware =
+    require("../middlewares/authMiddleware");
 
 const {
     criarGrupo
@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post(
     "/grupos",
-    autenticarToken,
+    authMiddleware,
     criarGrupo
 );
 
