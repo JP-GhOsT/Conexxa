@@ -80,8 +80,12 @@ function Login() {
 
     } catch (error) {
 
+      const mensagem =
+        error.response?.data?.mensagem ||
+        "Ocorreu um erro inesperado.";
+
       setErrors({
-        auth: "E-mail ou senha inválidos"
+        auth: mensagem
       });
 
     }
