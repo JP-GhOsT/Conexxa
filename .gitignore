@@ -19,6 +19,7 @@ node_modules/
 dist/
 build/
 coverage/
+frontend/dist/
 
 # Environment variables
 .env
