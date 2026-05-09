@@ -5,6 +5,7 @@ require("dotenv").config();
 
 require("./models/userModel");
 require("./models/groupModel");
+require("./models/groupMembershipModel");
 
 const authRoutes = require("./routes/authRoutes");
 const studyGroupRoutes = require("./routes/studyGroupRoutes");
