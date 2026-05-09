@@ -1,30 +1,14 @@
 const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
-
-require("./models/userModel");
-require("./models/groupModel");
-require("./models/groupMembershipModel");
-
-const authRoutes = require("./routes/authRoutes");
-const studyGroupRoutes = require("./routes/studyGroupRoutes");
-const usuariosRoutes = require("./routes/usuariosRoutes");
-
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-// ROTAS
+const authRoutes = require("./routes/authRoutes");
+const groupRoutes = require("./routes/studyGroupRoutes");
+
 app.use("/auth", authRoutes);
-app.use("/groups", studyGroupRoutes);
-app.use("/api/usuarios", usuariosRoutes);
+app.use("/", groupRoutes);
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+app.listen(3000, () => {
+  console.log("Servidor rodando na porta 3000");
 });
-
-const usuariosRoutes = require("./routes/usuariosRoutes");
-app.use("/api", usuariosRoutes);

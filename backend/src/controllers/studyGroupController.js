@@ -1,70 +1,113 @@
 const db = require("../database/connection");
 const { v4: uuidv4 } = require("uuid");
 
-// Limite máximo opcional
-const MAX_PARTICIPANT_LIMIT = 100;
-const validLocationTypes = ["ONLINE", "PRESENTIAL"];
+const MAX_LIMIT = 100;
+const validTypes = ["ONLINE", "PRESENTIAL"];
 
-const registerGroup = (req, res) => {
-  try {
-    const { subject, objective, locationType, participantLimit, creator_id } = req.body;
+/* =========================
+   CREATE GROUP
+========================= */
+const createStudyGroup = (req, res) => {
+  const { subject, objective, locationType, participantLimit } = req.body;
 
-    // Validações obrigatórias
-    if (!subject || !subject.trim()) {
-      return res.status(400).json({ success: false, message: "subject é obrigatório" });
-    }
-    if (!objective || !objective.trim()) {
-      return res.status(400).json({ success: false, message: "objective é obrigatório" });
-    }
-
-    // Validar enum locationType
-    if (!locationType || !validLocationTypes.includes(locationType)) {
-      return res.status(400).json({ success: false, message: "locationType deve ser ONLINE ou PRESENTIAL" });
-    }
-
-    // Validar participantLimit
-    if (participantLimit === undefined || participantLimit === null) {
-      return res.status(400).json({ success: false, message: "participantLimit é obrigatório" });
-    }
-    const limit = Number(participantLimit);
-    if (Number.isNaN(limit) || limit <= 0) {
-      return res.status(400).json({ success: false, message: "participantLimit deve ser maior que 0" });
-    }
-    if (limit > MAX_PARTICIPANT_LIMIT) {
-      return res.status(400).json({ success: false, message: `participantLimit deve ser no máximo ${MAX_PARTICIPANT_LIMIT}` });
-    }
-
-    // Criar e salvar
-    const id = uuidv4();
-    const creator = creator_id || "temp-user-id";
-
-    db.run(
-      `INSERT INTO groups (id, subject, objective, location_type, participant_limit, creator_id)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [id, subject, objective, locationType, limit, creator],
-      function (err) {
-        if (err) {
-          return res.status(500).json({ success: false, message: "Erro ao salvar grupo" });
-        }
-
-        // Retorna o objeto criado com ID
-        const created = {
-          id,
-          subject,
-          objective,
-          locationType,
-          participantLimit: limit,
-          creator_id: creator
-        };
-
-        return res.status(201).json({ success: true, group: created });
-      }
-    );
-  } catch (error) {
-    return res.status(500).json({ success: false, message: "Erro interno" });
+  if (!subject || !objective) {
+    return res.status(400).json({ message: "Campos obrigatórios" });
   }
+
+  if (!validTypes.includes(locationType)) {
+    return res.status(400).json({ message: "locationType inválido" });
+  }
+
+  const limit = Number(participantLimit);
+
+  if (!limit || limit <= 0 || limit > MAX_LIMIT) {
+    return res.status(400).json({ message: "Limite inválido" });
+  }
+
+  const id = uuidv4();
+  const creator_id = req.user?.id || "temp-user";
+
+  db.run(
+    `INSERT INTO groups (id, subject, objective, location_type, participant_limit, creator_id)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [id, subject, objective, locationType, limit, creator_id],
+    function (err) {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "Erro ao criar grupo" });
+      }
+
+      return res.status(201).json({
+        success: true,
+        group: { id, subject, objective, locationType, participantLimit: limit }
+      });
+    }
+  );
+};
+
+/* =========================
+   UPDATE GROUP
+========================= */
+const updateStudyGroup = (req, res) => {
+  const { id } = req.params;
+  const { subject, objective, locationType, participantLimit } = req.body;
+
+  db.run(
+    `UPDATE groups
+     SET subject = ?, objective = ?, location_type = ?, participant_limit = ?
+     WHERE id = ?`,
+    [subject, objective, locationType, participantLimit, id],
+    function (err) {
+      if (err) return res.status(500).json({ message: "Erro ao atualizar" });
+
+      if (this.changes === 0) {
+        return res.status(404).json({ message: "Grupo não encontrado" });
+      }
+
+      return res.json({ success: true, message: "Atualizado com sucesso" });
+    }
+  );
+};
+
+/* =========================
+   JOIN REQUEST
+========================= */
+const requestJoinGroup = (req, res) => {
+  const { groupId } = req.params;
+  const userId = req.user?.id || "temp-user";
+
+  db.get(
+    `SELECT * FROM group_memberships WHERE group_id = ? AND user_id = ?`,
+    [groupId, userId],
+    (err, row) => {
+      if (err) return res.status(500).json({ message: "Erro interno" });
+
+      if (row) {
+        return res.status(400).json({ message: "Já solicitou ou já é membro" });
+      }
+
+      db.run(
+        `INSERT INTO group_memberships (id, group_id, user_id, status)
+         VALUES (?, ?, ?, ?)`,
+        [uuidv4(), groupId, userId, "PENDING"],
+        function (err2) {
+          if (err2) {
+            return res.status(500).json({ message: "Erro ao solicitar entrada" });
+          }
+
+          return res.status(201).json({
+            success: true,
+            message: "Solicitação enviada",
+            data: { groupId, userId, status: "PENDING" }
+          });
+        }
+      );
+    }
+  );
 };
 
 module.exports = {
-  registerGroup,
+  createStudyGroup,
+  updateStudyGroup,
+  requestJoinGroup
 };
