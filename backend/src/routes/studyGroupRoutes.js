@@ -1,24 +1,21 @@
 const express = require("express");
 const router = express.Router();
 
-const groupController = require("../controllers/groupController");
+const {
+  createStudyGroup,
+  updateStudyGroup,
+  requestJoinGroup
+} = require("../controllers/groupController");
+
 const authMiddleware = require("../middlewares/authMiddleware");
-const { createStudyGroup, updateStudyGroup, getStudyGroupById } = require("../controllers/studyGroupController");
 
-// Criar grupo
-router.post("/study-groups", createStudyGroup);
+// criar grupo
+router.post("/study-groups", authMiddleware, createStudyGroup);
 
-// Atualizar grupo
-router.put("/study-groups/:id", updateStudyGroup);
+// atualizar grupo
+router.put("/study-groups/:id", authMiddleware, updateStudyGroup);
 
-// Buscar grupo por ID
-router.get("/study-groups/:id", getStudyGroupById);
-
-// Join request
-router.post(
-  "/:groupId/join-request",
-  authMiddleware,
-  groupController.requestJoinGroup
-);
+// join request
+router.post("/:groupId/join-request", authMiddleware, requestJoinGroup);
 
 module.exports = router;
