@@ -9,8 +9,24 @@ const {
 
 const authMiddleware = require("../middlewares/authMiddleware");
 
+/* =========================
+   GROUPS
+========================= */
+
+// Criar grupo (protegido)
 router.post("/study-groups", authMiddleware, createStudyGroup);
-router.put("/study-groups/:id", updateStudyGroup);
-router.post("/groups/:groupId/join-request", authMiddleware, requestJoinGroup);
+
+// Atualizar grupo (PROVAVELMENTE deve ser protegido também)
+router.put("/study-groups/:id", authMiddleware, updateStudyGroup);
+
+/* =========================
+   JOIN REQUEST
+========================= */
+
+router.post(
+  "/study-groups/:groupId/join-request",
+  authMiddleware,
+  requestJoinGroup
+);
 
 module.exports = router;
