@@ -17,82 +17,98 @@ export default function Dashboard() {
       <h1>Dashboard</h1>
 
       <p>
-        Bem-vindo, {user?.nomeCompleto ?? "Usuário"} 👋
+        Bem-vindo, {user?.nomeCompleto || "Usuário"} 👋
       </p>
 
       <div style={styles.grid}>
 
-        {/* CRIAR GRUPO */}
+        {/* =========================
+            CRIAR GRUPO
+        ========================= */}
         <div
           style={styles.card}
           onClick={() => navigate("/create-group")}
         >
-          <h2>Criar Grupo</h2>
+          <h2>➕ Criar Grupo</h2>
           <p>Criar novo grupo de estudo</p>
         </div>
 
-        {/* GRUPOS */}
+        {/* =========================
+            VER GRUPOS (LISTA OU DETALHES)
+            AQUI você pode depois trocar por API
+        ========================= */}
         <div
           style={styles.card}
           onClick={() => navigate("/groups")}
         >
-          <h2>Grupos</h2>
+          <h2>📚 Grupos</h2>
           <p>Ver grupos disponíveis</p>
         </div>
 
-        {/* PERFIL */}
+        {/* =========================
+            PERFIL
+        ========================= */}
         <div
           style={styles.card}
           onClick={() => navigate("/profile")}
         >
-          <h2>Perfil</h2>
+          <h2>👤 Perfil</h2>
           <p>Ver seus dados</p>
         </div>
 
       </div>
 
+      {/* =========================
+          LOGOUT
+      ========================= */}
       <button
         onClick={handleLogout}
         style={styles.logout}
       >
-        Sair
+        🚪 Sair
       </button>
 
     </div>
   );
 }
 
+/* =========================
+   STYLES
+========================= */
 const styles = {
 
   container: {
     padding: 40,
     fontFamily: "Arial",
+    background: "#f9f9f9",
+    minHeight: "100vh"
   },
 
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     gap: 20,
-    marginTop: 30,
+    marginTop: 30
   },
 
   card: {
     padding: 20,
-    background: "#f5f5f5",
-    borderRadius: 10,
+    background: "#fff",
+    borderRadius: 12,
     cursor: "pointer",
+    boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
     transition: "0.2s",
-    boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
+    userSelect: "none"
   },
 
   logout: {
     marginTop: 40,
     padding: 12,
-    background: "red",
+    background: "#e74c3c",
     color: "#fff",
     border: "none",
     cursor: "pointer",
-    borderRadius: 6,
+    borderRadius: 8,
+    fontWeight: "bold"
   }
-
 };
