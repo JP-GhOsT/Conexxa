@@ -1,3 +1,5 @@
+// backend/src/controllers/studyGroupController.js
+
 const db = require("../database/connection");
 
 const { v4: uuidv4 } = require("uuid");
@@ -21,6 +23,7 @@ const createStudyGroup = (req, res) => {
     participantLimit
   } = req.body;
 
+  // VALIDAÇÕES
   if (
     !subject ||
     !subject.trim() ||
@@ -60,7 +63,7 @@ const createStudyGroup = (req, res) => {
   const id = uuidv4();
 
   const creator_id =
-    req.user?.id || "temp-user";
+    req.user?.id;
 
   db.run(
 
@@ -220,66 +223,131 @@ const updateStudyGroup = (req, res) => {
     participantLimit
   } = req.body;
 
+  // VALIDAÇÕES
+  if (
+    !subject ||
+    !subject.trim() ||
+    !objective ||
+    !objective.trim()
+  ) {
+
+    return res.status(400).json({
+      message: "Campos obrigatórios"
+    });
+
+  }
+
+  if (!validTypes.includes(locationType)) {
+
+    return res.status(400).json({
+      message: "locationType inválido"
+    });
+
+  }
+
   const limit =
     Number(participantLimit);
 
-  db.run(
+  if (
+    !limit ||
+    limit <= 0 ||
+    limit > MAX_LIMIT
+  ) {
 
-    `UPDATE groups
+    return res.status(400).json({
+      message: "Limite inválido"
+    });
 
-     SET
-       subject = ?,
-       objective = ?,
-       location_type = ?,
-       participant_limit = ?
+  }
 
-     WHERE id = ?`,
+  // VERIFICAR DONO DO GRUPO
+  db.get(
 
-    [
-      subject,
-      objective,
-      locationType,
-      limit,
-      id
-    ],
+    `SELECT * FROM groups WHERE id = ?`,
 
-    function (err) {
+    [id],
+
+    (err, group) => {
 
       if (err) {
 
-        console.log(
-          "SQL ERROR:",
-          err
-        );
-
         return res.status(500).json({
-
-          message:
-            "Erro ao atualizar",
-
-          error: err.message
-
+          message: "Erro ao buscar grupo"
         });
 
       }
 
-      if (this.changes === 0) {
+      if (!group) {
 
         return res.status(404).json({
-          message:
-            "Grupo não encontrado"
+          message: "Grupo não encontrado"
         });
 
       }
 
-      return res.json({
+      // APENAS O CRIADOR PODE EDITAR
+      if (group.creator_id !== req.user.id) {
 
-        success: true,
+        return res.status(403).json({
+          message:
+            "Apenas o criador pode editar o grupo"
+        });
 
-        message:
-          "Atualizado com sucesso"
+      }
 
-      });
+      db.run(
+
+        `UPDATE groups
+
+         SET
+           subject = ?,
+           objective = ?,
+           location_type = ?,
+           participant_limit = ?
+
+         WHERE id = ?`,
+
+        [
+          subject,
+          objective,
+          locationType,
+          limit,
+          id
+        ],
+
+        function (updateErr) {
+
+          if (updateErr) {
+
+            console.log(
+              "SQL ERROR:",
+              updateErr
+            );
+
+            return res.status(500).json({
+
+              message:
+                "Erro ao atualizar",
+
+              error:
+                updateErr.message
+
+            });
+
+          }
+
+          return res.json({
+
+            success: true,
+
+            message:
+              "Atualizado com sucesso"
+
+          });
+
+        }
+
+      );
 
     }
 
@@ -295,7 +363,7 @@ const requestJoinGroup = (req, res) => {
   const { groupId } = req.params;
 
   const userId =
-    req.user?.id || "temp-user";
+    req.user?.id;
 
   db.get(
 

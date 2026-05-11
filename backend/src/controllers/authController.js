@@ -20,7 +20,11 @@ const register = (req, res) => {
   } = req.body;
 
   // VALIDAÇÃO
-  if (!nomeCompleto || !email || !senha) {
+  if (
+    !nomeCompleto ||
+    !email ||
+    !senha
+  ) {
 
     return res.status(400).json({
       message: "Campos obrigatórios"
@@ -30,18 +34,28 @@ const register = (req, res) => {
 
   // VERIFICAR EMAIL
   db.get(
+
     "SELECT id FROM users WHERE email = ?",
+
     [email],
 
     async (err, user) => {
 
       if (err) {
 
-        console.log("SQL ERROR:", err);
+        console.log(
+          "SQL ERROR:",
+          err
+        );
 
         return res.status(500).json({
-          message: "Erro no banco",
-          error: err.message
+
+          message:
+            "Erro no banco",
+
+          error:
+            err.message
+
         });
 
       }
@@ -50,14 +64,20 @@ const register = (req, res) => {
       if (user) {
 
         return res.status(409).json({
-          message: "Email já cadastrado"
+
+          message:
+            "Email já cadastrado"
+
         });
 
       }
 
       // HASH SENHA
       const hashedPassword =
-        await bcrypt.hash(senha, 10);
+        await bcrypt.hash(
+          senha,
+          10
+        );
 
       // UUID
       const id = uuidv4();
@@ -74,7 +94,7 @@ const register = (req, res) => {
         )
 
         VALUES (?, ?, ?, ?)`,
-        
+
         [
           id,
           nomeCompleto,
@@ -92,8 +112,13 @@ const register = (req, res) => {
             );
 
             return res.status(500).json({
-              message: "Erro ao criar usuário",
-              error: insertErr.message
+
+              message:
+                "Erro ao criar usuário",
+
+              error:
+                insertErr.message
+
             });
 
           }
@@ -103,9 +128,13 @@ const register = (req, res) => {
             success: true,
 
             user: {
+
               id,
+
               nomeCompleto,
+
               email
+
             }
 
           });
@@ -125,21 +154,34 @@ const register = (req, res) => {
 ========================= */
 const login = (req, res) => {
 
-  const { email, senha } = req.body;
+  const {
+    email,
+    senha
+  } = req.body;
 
   db.get(
+
     "SELECT * FROM users WHERE email = ?",
+
     [email],
 
     async (err, user) => {
 
       if (err) {
 
-        console.log("SQL ERROR:", err);
+        console.log(
+          "SQL ERROR:",
+          err
+        );
 
         return res.status(500).json({
-          message: "Erro no banco",
-          error: err.message
+
+          message:
+            "Erro no banco",
+
+          error:
+            err.message
+
         });
 
       }
@@ -148,7 +190,10 @@ const login = (req, res) => {
       if (!user) {
 
         return res.status(404).json({
-          message: "Usuário não encontrado"
+
+          message:
+            "Usuário não encontrado"
+
         });
 
       }
@@ -163,7 +208,10 @@ const login = (req, res) => {
       if (!valid) {
 
         return res.status(401).json({
-          message: "Senha inválida"
+
+          message:
+            "Senha inválida"
+
         });
 
       }
@@ -198,7 +246,8 @@ const login = (req, res) => {
           nomeCompleto:
             user.nome_completo,
 
-          email: user.email
+          email:
+            user.email
 
         }
 
@@ -214,6 +263,9 @@ const login = (req, res) => {
    EXPORTS
 ========================= */
 module.exports = {
+
   register,
+
   login
+
 };
