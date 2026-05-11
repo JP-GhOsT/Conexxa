@@ -153,10 +153,18 @@ function Register() {
         formData
       );
 
+      console.log(response.data);
+      
       toast.success(
         response.data.message ||
         "Usuário cadastrado com sucesso!"
       );
+
+       // SALVAR TOKEN
+        localStorage.setItem(
+          "@connexa_token",
+          response.data.token
+        );
 
       // LIMPAR FORM
       setFormData({
@@ -168,7 +176,7 @@ function Register() {
       setErrors({});
 
       // REDIRECIONAR LOGIN
-      navigate("/login");
+      navigate("/dashboard");
 
     } catch (error) {
 
