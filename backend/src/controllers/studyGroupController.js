@@ -219,6 +219,55 @@ const getJoinRequestStatus = (req, res) => {
 };
 
 /* =========================
+   ACCEPT JOIN REQUEST (ADMIN)
+========================= */
+const acceptJoinRequest = (req, res) => {
+  const { groupId, userId } = req.params;
+  const adminId = req.user?.id;
+
+  // 1. Verificar se o grupo existe e se o usuário é admin
+  db.get(
+    `SELECT * FROM groups WHERE id = ?`,
+    [groupId],
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro interno" });
+      }
+
+      if (!group) {
+        return res.status(404).json({ message: "Grupo não encontrado" });
+      }
+
+      if (group.creator_id !== adminId) {
+        return res.status(403).json({
+          message: "Apenas o criador pode aceitar pedidos"
+        });
+      }
+
+      // 2. Atualizar status para ACCEPTED
+      db.run(
+        `UPDATE group_memberships
+         SET status = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE group_id = ? AND user_id = ?`,
+        ["ACCEPTED", groupId, userId],
+        function (err2) {
+          if (err2) {
+            return res.status(500).json({
+              message: "Erro ao aceitar pedido"
+            });
+          }
+
+          return res.json({
+            success: true,
+            message: "Usuário aceito no grupo"
+          });
+        }
+      );
+    }
+  );
+};
+
+/* =========================
    EXPORT
 ========================= */
 module.exports = {
@@ -227,5 +276,6 @@ module.exports = {
   getStudyGroupById,
   updateStudyGroup,
   requestJoinGroup,
-  getJoinRequestStatus
+  getJoinRequestStatus,
+  acceptJoinRequest
 };

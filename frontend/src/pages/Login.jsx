@@ -61,8 +61,8 @@ function Login() {
       const token = response.data.token;
       const user = response.data.user;
 
-      // 🔥 CORREÇÃO PRINCIPAL (ESSENCIAL)
-      localStorage.setItem("token", token);
+      // salva token
+      localStorage.setItem("@connexa_token", token);
 
       // contexto global
       login(token, user);
@@ -70,6 +70,7 @@ function Login() {
       alert("Login realizado com sucesso");
 
       navigate("/dashboard");
+
     } catch (error) {
       const mensagem =
         error.response?.data?.message ||
@@ -111,14 +112,27 @@ function Login() {
         {/* ERRO GLOBAL */}
         {errors.auth && <p style={styles.error}>{errors.auth}</p>}
 
+        {/* BOTÃO LOGIN */}
         <button style={styles.button} type="submit">
           Entrar
+        </button>
+
+        {/* BOTÃO CADASTRO */}
+        <button
+          type="button"
+          style={styles.registerButton}
+          onClick={() => navigate("/register")}
+        >
+          Criar conta
         </button>
       </form>
     </div>
   );
 }
 
+/* =========================
+   STYLES
+========================= */
 const styles = {
   container: {
     display: "flex",
@@ -147,7 +161,23 @@ const styles = {
   button: {
     padding: "12px",
     fontSize: "16px",
-    cursor: "pointer"
+    cursor: "pointer",
+    background: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    marginTop: "10px"
+  },
+
+  registerButton: {
+    marginTop: "10px",
+    padding: "12px",
+    fontSize: "16px",
+    cursor: "pointer",
+    background: "transparent",
+    border: "1px solid #007bff",
+    color: "#007bff",
+    borderRadius: "6px"
   },
 
   error: {

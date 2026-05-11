@@ -15,7 +15,7 @@ function EditStudyGroup() {
   ========================= */
   useEffect(() => {
     api
-      .get(`/study-groups/${id}`)
+      .get(`/groups/study-groups/${id}`)
       .then((res) => {
         setGrupo(res.data.group);
         setLoading(false);
@@ -33,7 +33,7 @@ function EditStudyGroup() {
     e.preventDefault();
 
     try {
-      const response = await api.put(`/study-groups/${id}`, grupo);
+      const response = await api.put(`/groups/study-groups/${id}`, grupo);
 
       toast.success(response.data.message || "Grupo atualizado com sucesso");
 

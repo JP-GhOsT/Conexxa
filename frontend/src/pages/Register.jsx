@@ -2,11 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
-
 import { toast } from "react-toastify";
 
 function Register() {
-
   const [formData, setFormData] = useState({
     nomeCompleto: "",
     email: "",
@@ -14,7 +12,6 @@ function Register() {
   });
 
   const [errors, setErrors] = useState({});
-
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -23,99 +20,61 @@ function Register() {
      VALIDAR CAMPOS
   ========================= */
   const validateField = (name, value) => {
-
     let error = "";
 
-    // NOME
     if (name === "nomeCompleto") {
-
-      if (!value.trim()) {
-        error = "Nome é obrigatório";
-      }
-
+      if (!value.trim()) error = "Nome é obrigatório";
     }
 
-    // EMAIL
     if (name === "email") {
-
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       if (!value.trim()) {
-
         error = "E-mail é obrigatório";
-
       } else if (!emailRegex.test(value)) {
-
         error = "E-mail inválido";
-
       }
-
     }
 
-    // SENHA
     if (name === "senha") {
-
-      const senhaRegex =
-        /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+      const senhaRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
       if (!value.trim()) {
-
         error = "Senha é obrigatória";
-
       } else if (!senhaRegex.test(value)) {
-
         error =
           "Senha deve ter no mínimo 8 caracteres, 1 letra e 1 número";
-
       }
-
     }
 
-    setErrors((prevErrors) => ({
-      ...prevErrors,
+    setErrors((prev) => ({
+      ...prev,
       [name]: error
     }));
 
     return error === "";
-
   };
 
   /* =========================
      VALIDAR TUDO
   ========================= */
   const validateAll = () => {
-
-    const fields = [
-      "nomeCompleto",
-      "email",
-      "senha"
-    ];
+    const fields = ["nomeCompleto", "email", "senha"];
 
     let ok = true;
 
     fields.forEach((field) => {
-
-      const valid =
-        validateField(
-          field,
-          formData[field] ?? ""
-        );
-
-      if (!valid) {
-        ok = false;
-      }
-
+      const valid = validateField(field, formData[field] ?? "");
+      if (!valid) ok = false;
     });
 
     return ok;
-
   };
 
   /* =========================
      HANDLE INPUT
   ========================= */
   const handleChange = (e) => {
-
     const { name, value } = e.target;
 
     setFormData({
@@ -124,41 +83,29 @@ function Register() {
     });
 
     validateField(name, value);
-
   };
 
   /* =========================
      SUBMIT
   ========================= */
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     if (!validateAll()) {
-
-      toast.error(
-        "Corrija os erros antes de enviar."
-      );
-
+      toast.error("Corrija os erros antes de enviar.");
       return;
-
     }
 
     setLoading(true);
 
     try {
-
-      const response = await api.post(
-        "/auth/register",
-        formData
-      );
+      const response = await api.post("/auth/register", formData);
 
       toast.success(
         response.data.message ||
-        "Usuário cadastrado com sucesso!"
+          "Usuário cadastrado com sucesso!"
       );
 
-      // LIMPAR FORM
       setFormData({
         nomeCompleto: "",
         email: "",
@@ -167,56 +114,33 @@ function Register() {
 
       setErrors({});
 
-      // REDIRECIONAR LOGIN
-      navigate("/login");
+      // redireciona para login
+      setTimeout(() => {
+        navigate("/login");
+      }, 500);
 
     } catch (error) {
-
-      const status =
-        error.response?.status;
-
-      const message =
-        error.response?.data?.message;
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
 
       if (status === 409) {
-
         setErrors((prev) => ({
           ...prev,
           email: "E-mail já cadastrado"
         }));
-
-      } else if (message) {
-
-        toast.error(message);
-
       } else {
-
-        toast.error(
-          "Erro ao cadastrar usuário."
-        );
-
+        toast.error(message || "Erro ao cadastrar usuário.");
       }
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
   return (
-
     <div style={styles.container}>
-
-      <form
-        style={styles.form}
-        onSubmit={handleSubmit}
-      >
-
+      <form style={styles.form} onSubmit={handleSubmit}>
         <h1>Cadastro</h1>
 
-        {/* NOME */}
         <input
           style={styles.input}
           type="text"
@@ -225,14 +149,10 @@ function Register() {
           value={formData.nomeCompleto}
           onChange={handleChange}
         />
-
         {errors.nomeCompleto && (
-          <p style={styles.error}>
-            {errors.nomeCompleto}
-          </p>
+          <p style={styles.error}>{errors.nomeCompleto}</p>
         )}
 
-        {/* EMAIL */}
         <input
           style={styles.input}
           type="email"
@@ -241,14 +161,10 @@ function Register() {
           value={formData.email}
           onChange={handleChange}
         />
-
         {errors.email && (
-          <p style={styles.error}>
-            {errors.email}
-          </p>
+          <p style={styles.error}>{errors.email}</p>
         )}
 
-        {/* SENHA */}
         <input
           style={styles.input}
           type="password"
@@ -257,41 +173,36 @@ function Register() {
           value={formData.senha}
           onChange={handleChange}
         />
-
         {errors.senha && (
-          <p style={styles.error}>
-            {errors.senha}
-          </p>
+          <p style={styles.error}>{errors.senha}</p>
         )}
 
-        {/* BOTÃO */}
+        {/* BOTÃO CADASTRAR */}
         <button
           style={styles.button}
           type="submit"
           disabled={loading}
         >
-
-          {
-            loading
-              ? "Cadastrando..."
-              : "Cadastrar"
-          }
-
+          {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
 
+        {/* BOTÃO LOGIN */}
+        <button
+          type="button"
+          style={styles.loginButton}
+          onClick={() => navigate("/login")}
+        >
+          Já tenho conta
+        </button>
       </form>
-
     </div>
-
   );
-
 }
 
 /* =========================
    STYLES
 ========================= */
 const styles = {
-
   container: {
     display: "flex",
     justifyContent: "center",
@@ -307,8 +218,7 @@ const styles = {
     padding: "30px",
     background: "#fff",
     borderRadius: "10px",
-    boxShadow:
-      "0px 0px 10px rgba(0,0,0,0.1)"
+    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)"
   },
 
   input: {
@@ -320,14 +230,29 @@ const styles = {
   button: {
     padding: "12px",
     fontSize: "16px",
-    cursor: "pointer"
+    cursor: "pointer",
+    background: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    marginTop: "10px"
+  },
+
+  loginButton: {
+    marginTop: "10px",
+    padding: "12px",
+    fontSize: "16px",
+    cursor: "pointer",
+    background: "transparent",
+    border: "1px solid #007bff",
+    color: "#007bff",
+    borderRadius: "6px"
   },
 
   error: {
     color: "red",
     marginBottom: "10px"
   }
-
 };
 
 export default Register;

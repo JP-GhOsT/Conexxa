@@ -7,7 +7,8 @@ const {
   updateStudyGroup,
   getAllStudyGroups,
   requestJoinGroup,
-  getJoinRequestStatus
+  getJoinRequestStatus,
+  acceptJoinRequest
 } = require("../controllers/studyGroupController");
 
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -38,6 +39,12 @@ router.get(
   "/study-groups/:groupId/join-request-status",
   authMiddleware,
   getJoinRequestStatus
+);
+
+router.patch(
+  "/study-groups/:groupId/requests/:userId/accept",
+  authMiddleware,
+  acceptJoinRequest
 );
 
 module.exports = router;
