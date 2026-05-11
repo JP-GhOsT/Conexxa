@@ -6,44 +6,24 @@ import {
 } from "react-router-dom";
 
 import Login from "./pages/Login";
-
 import Register from "./pages/Register";
-
 import Dashboard from "./pages/Dashboard";
-
 import CreateStudyGroup from "./pages/CreateStudyGroup";
-
 import EditStudyGroup from "./pages/EditStudyGroup";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
-
   return (
-
     <BrowserRouter>
-
       <Routes>
 
-        {/* REDIRECT INICIAL */}
-        <Route
-          path="/"
-          element={<Navigate to="/login" />}
-        />
+        <Route path="/" element={<Navigate to="/login" />} />
 
-        {/* REGISTER */}
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+        <Route path="/login" element={<Login />} />
 
-        {/* LOGIN */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        <Route path="/register" element={<Register />} />
 
-        {/* DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -53,7 +33,6 @@ function App() {
           }
         />
 
-        {/* CREATE GROUP */}
         <Route
           path="/create-group"
           element={
@@ -63,7 +42,6 @@ function App() {
           }
         />
 
-        {/* EDIT GROUP */}
         <Route
           path="/edit-group/:id"
           element={
@@ -73,12 +51,12 @@ function App() {
           }
         />
 
+        {/* fallback */}
+        <Route path="*" element={<Navigate to="/login" />} />
+
       </Routes>
-
     </BrowserRouter>
-
   );
-
 }
 
 export default App;
