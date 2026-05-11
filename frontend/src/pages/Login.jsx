@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
 import api from "../services/api";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
+
+  const navigate = useNavigate();
+
+  const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -10,7 +17,9 @@ function Login() {
 
   const [errors, setErrors] = useState({});
 
-  // VALIDAR CAMPOS
+  /* =========================
+     VALIDAR CAMPOS
+  ========================= */
   const validateField = (name, value) => {
 
     let error = "";
@@ -34,7 +43,9 @@ function Login() {
 
   };
 
-  // HANDLE INPUT
+  /* =========================
+     HANDLE INPUT
+  ========================= */
   const handleChange = (e) => {
 
     const { name, value } = e.target;
@@ -48,7 +59,9 @@ function Login() {
 
   };
 
-  // SUBMIT
+  /* =========================
+     SUBMIT
+  ========================= */
   const handleSubmit = async (e) => {
 
     e.preventDefault();
@@ -62,26 +75,29 @@ function Login() {
 
     try {
 
-      const response =
-        await api.post(
-          "/auth/login",
-          formData
-        );
-
-      console.log(response.data);
-
-      // SALVAR TOKEN
-      localStorage.setItem(
-        "token",
-        response.data.token
+      const response = await api.post(
+        "/auth/login",
+        formData
       );
 
+      // TOKEN
+      const token = response.data.token;
+
+      // USER
+      const user = response.data.user;
+
+      // LOGIN GLOBAL
+      login(token, user);
+
       alert("Login realizado com sucesso");
+
+      // REDIRECIONAR
+      navigate("/dashboard");
 
     } catch (error) {
 
       const mensagem =
-        error.response?.data?.mensagem ||
+        error.response?.data?.message ||
         "Ocorreu um erro inesperado.";
 
       setErrors({

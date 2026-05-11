@@ -1,32 +1,71 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
+
   createStudyGroup,
+
+  getStudyGroupById,
+
   updateStudyGroup,
+
   requestJoinGroup
+
 } = require("../controllers/studyGroupController");
 
-const authMiddleware = require("../middlewares/authMiddleware");
+const authMiddleware =
+  require("../middlewares/authMiddleware");
 
 /* =========================
    GROUPS
 ========================= */
 
-// Criar grupo (protegido)
-router.post("/study-groups", authMiddleware, createStudyGroup);
+// CRIAR GRUPO
+router.post(
 
-// Atualizar grupo (PROVAVELMENTE deve ser protegido também)
-router.put("/study-groups/:id", authMiddleware, updateStudyGroup);
+  "/study-groups",
+
+  authMiddleware,
+
+  createStudyGroup
+
+);
+
+// BUSCAR GRUPO POR ID
+router.get(
+
+  "/study-groups/:id",
+
+  authMiddleware,
+
+  getStudyGroupById
+
+);
+
+// ATUALIZAR GRUPO
+router.put(
+
+  "/study-groups/:id",
+
+  authMiddleware,
+
+  updateStudyGroup
+
+);
 
 /* =========================
    JOIN REQUEST
 ========================= */
 
 router.post(
+
   "/study-groups/:groupId/join-request",
+
   authMiddleware,
+
   requestJoinGroup
+
 );
 
 module.exports = router;
