@@ -1,71 +1,43 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
-
   createStudyGroup,
-
   getStudyGroupById,
-
   updateStudyGroup,
-
-  requestJoinGroup
-
+  getAllStudyGroups,
+  requestJoinGroup,
+  getJoinRequestStatus
 } = require("../controllers/studyGroupController");
 
-const authMiddleware =
-  require("../middlewares/authMiddleware");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 /* =========================
    GROUPS
 ========================= */
 
-// CRIAR GRUPO
-router.post(
+router.post("/study-groups", authMiddleware, createStudyGroup);
 
-  "/study-groups",
+router.get("/study-groups", authMiddleware, getAllStudyGroups);
 
-  authMiddleware,
+router.get("/study-groups/:id", authMiddleware, getStudyGroupById);
 
-  createStudyGroup
-
-);
-
-// BUSCAR GRUPO POR ID
-router.get(
-
-  "/study-groups/:id",
-
-  authMiddleware,
-
-  getStudyGroupById
-
-);
-
-// ATUALIZAR GRUPO
-router.put(
-
-  "/study-groups/:id",
-
-  authMiddleware,
-
-  updateStudyGroup
-
-);
+router.put("/study-groups/:id", authMiddleware, updateStudyGroup);
 
 /* =========================
-   JOIN REQUEST
+   JOIN SYSTEM
 ========================= */
 
 router.post(
-
   "/study-groups/:groupId/join-request",
-
   authMiddleware,
-
   requestJoinGroup
+);
 
+router.get(
+  "/study-groups/:groupId/join-request-status",
+  authMiddleware,
+  getJoinRequestStatus
 );
 
 module.exports = router;
