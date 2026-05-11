@@ -17,7 +17,7 @@ app.use(express.json());
 
 // ROTAS
 app.use("/auth", authRoutes);
-app.use("/groups", studyGroupRoutes);
+app.use("/groups", studyGroupRoutes);gi
 app.use("/api/usuarios", usuariosRoutes);
 
 const PORT = process.env.PORT || 3000;
