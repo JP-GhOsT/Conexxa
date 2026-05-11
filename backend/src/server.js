@@ -35,14 +35,11 @@ const authRoutes =
 const studyGroupRoutes =
   require("./routes/studyGroupRoutes");
 
-const usuariosRoutes =
-  require("./routes/usuariosRoutes");
-
+// AUTH
 app.use("/auth", authRoutes);
 
+// GROUPS
 app.use("/groups", studyGroupRoutes);
-
-app.use("/api/usuarios", usuariosRoutes);
 
 /* =========================
    SERVER
