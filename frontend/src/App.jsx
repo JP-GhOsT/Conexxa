@@ -9,8 +9,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CreateStudyGroup from "./pages/CreateStudyGroup";
+import GroupDetails from "./pages/GroupDetails";
 import EditStudyGroup from "./pages/EditStudyGroup";
 import Profile from "./pages/Profile";
+import Groups from "./pages/Groups";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -19,12 +21,14 @@ function App() {
     <BrowserRouter>
       <Routes>
 
+        {/* REDIRECT INICIAL */}
         <Route path="/" element={<Navigate to="/login" />} />
 
+        {/* AUTH */}
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
 
+        {/* DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -34,6 +38,7 @@ function App() {
           }
         />
 
+        {/* CREATE GROUP */}
         <Route
           path="/create-group"
           element={
@@ -43,6 +48,27 @@ function App() {
           }
         />
 
+        {/* LISTA DE GRUPOS (IMPORTANTE VIR ANTES DO :id) */}
+        <Route
+          path="/groups"
+          element={
+            <ProtectedRoute>
+              <Groups />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* GROUP DETAILS */}
+        <Route
+          path="/groups/:id"
+          element={
+            <ProtectedRoute>
+              <GroupDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* EDIT GROUP */}
         <Route
           path="/edit-group/:id"
           element={
@@ -62,7 +88,7 @@ function App() {
           }
         />
 
-        {/* fallback */}
+        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/login" />} />
 
       </Routes>

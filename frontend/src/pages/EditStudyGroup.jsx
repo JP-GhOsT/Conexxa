@@ -6,10 +6,13 @@ import { toast } from "react-toastify";
 function EditStudyGroup() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [grupo, setGrupo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Buscar dados do grupo
+  /* =========================
+     BUSCAR GRUPO
+  ========================= */
   useEffect(() => {
     api
       .get(`/study-groups/${id}`)
@@ -23,25 +26,44 @@ function EditStudyGroup() {
       });
   }, [id]);
 
-  // Atualizar grupo
+  /* =========================
+     ATUALIZAR GRUPO
+  ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const response = await api.put(`/study-groups/${id}`, grupo);
-      toast.success(response.data.message);
-      navigate(`/grupos/${id}`);
-    } catch {
+
+      toast.success(response.data.message || "Grupo atualizado com sucesso");
+
+      // ✅ CORREÇÃO AQUI (rota correta)
+      navigate(`/groups/${id}`);
+
+    } catch (err) {
       toast.error("Erro ao atualizar grupo");
     }
   };
 
+  /* =========================
+     HANDLE INPUT
+  ========================= */
   const handleChange = (e) => {
-    setGrupo({ ...grupo, [e.target.name]: e.target.value });
+    setGrupo({
+      ...grupo,
+      [e.target.name]: e.target.value
+    });
   };
 
+  /* =========================
+     LOADING / EMPTY
+  ========================= */
   if (loading) return <p>Carregando...</p>;
   if (!grupo) return <p>Grupo não encontrado.</p>;
 
+  /* =========================
+     UI
+  ========================= */
   return (
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleSubmit}>
@@ -50,31 +72,34 @@ function EditStudyGroup() {
         <input
           style={styles.input}
           name="subject"
-          value={grupo.subject}
+          value={grupo.subject || ""}
           onChange={handleChange}
           placeholder="Matéria"
         />
+
         <input
           style={styles.input}
           name="objective"
-          value={grupo.objective}
+          value={grupo.objective || ""}
           onChange={handleChange}
           placeholder="Objetivo"
         />
+
         <select
           style={styles.input}
           name="locationType"
-          value={grupo.locationType}
+          value={grupo.locationType || "ONLINE"}
           onChange={handleChange}
         >
           <option value="ONLINE">Online</option>
           <option value="PRESENTIAL">Presencial</option>
         </select>
+
         <input
           style={styles.input}
           type="number"
           name="participantLimit"
-          value={grupo.participantLimit}
+          value={grupo.participantLimit || 1}
           onChange={handleChange}
           placeholder="Limite de participantes"
         />
@@ -87,6 +112,9 @@ function EditStudyGroup() {
   );
 }
 
+/* =========================
+   ESTILOS
+========================= */
 const styles = {
   container: {
     display: "flex",
@@ -113,6 +141,10 @@ const styles = {
     padding: "12px",
     fontSize: "16px",
     cursor: "pointer",
+    background: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
   },
 };
 

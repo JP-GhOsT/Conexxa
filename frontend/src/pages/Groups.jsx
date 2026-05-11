@@ -1,0 +1,137 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
+
+export default function Groups() {
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  /* =========================
+     CARREGAR GRUPOS
+  ========================= */
+  useEffect(() => {
+    const loadGroups = async () => {
+      try {
+        const res = await api.get("/groups/study-groups");
+
+        setGroups(res.data.groups || []);
+      } catch (err) {
+        console.log("Erro ao buscar grupos:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadGroups();
+  }, []);
+
+  /* =========================
+     UI
+  ========================= */
+  if (loading) {
+    return <p style={styles.loading}>Carregando grupos...</p>;
+  }
+
+  return (
+    <div style={styles.container}>
+
+      <h1 style={styles.title}>📚 Grupos de Estudo</h1>
+
+      {groups.length === 0 ? (
+        <p style={styles.empty}>
+          Nenhum grupo encontrado.
+        </p>
+      ) : (
+        <div style={styles.grid}>
+          {groups.map((group) => (
+            <div
+              key={group.id}
+              style={styles.card}
+              onClick={() => navigate(`/groups/${group.id}`)}
+            >
+
+              <h2 style={styles.subject}>
+                {group.subject}
+              </h2>
+
+              <p style={styles.text}>
+                {group.objective}
+              </p>
+
+              <div style={styles.footer}>
+                <span>
+                  🌍 {group.locationType}
+                </span>
+
+                <span>
+                  👥 {group.participantLimit}
+                </span>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+/* =========================
+   STYLES
+========================= */
+const styles = {
+
+  container: {
+    padding: 30,
+    fontFamily: "Arial",
+    background: "#f5f6fa",
+    minHeight: "100vh"
+  },
+
+  title: {
+    marginBottom: 20
+  },
+
+  loading: {
+    padding: 30
+  },
+
+  empty: {
+    marginTop: 20,
+    color: "#666"
+  },
+
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: 20
+  },
+
+  card: {
+    background: "#fff",
+    padding: 20,
+    borderRadius: 12,
+    boxShadow: "0px 4px 12px rgba(0,0,0,0.08)",
+    cursor: "pointer",
+    transition: "0.2s"
+  },
+
+  subject: {
+    marginBottom: 10
+  },
+
+  text: {
+    color: "#555",
+    marginBottom: 15
+  },
+
+  footer: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: 14,
+    color: "#777"
+  }
+};

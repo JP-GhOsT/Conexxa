@@ -5,9 +5,7 @@ import api from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 
 function Login() {
-
   const navigate = useNavigate();
-
   const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -21,81 +19,58 @@ function Login() {
      VALIDAR CAMPOS
   ========================= */
   const validateField = (name, value) => {
-
     let error = "";
 
     if (!value.trim()) {
-
-      if (name === "email") {
-        error = "E-mail é obrigatório";
-      }
-
-      if (name === "senha") {
-        error = "Senha é obrigatória";
-      }
-
+      if (name === "email") error = "E-mail é obrigatório";
+      if (name === "senha") error = "Senha é obrigatória";
     }
 
-    setErrors((prevErrors) => ({
-      ...prevErrors,
+    setErrors((prev) => ({
+      ...prev,
       [name]: error
     }));
-
   };
 
   /* =========================
      HANDLE INPUT
   ========================= */
   const handleChange = (e) => {
-
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value
-    });
+    }));
 
     validateField(name, value);
-
   };
 
   /* =========================
-     SUBMIT
+     SUBMIT LOGIN
   ========================= */
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
-    const hasErrors =
-      Object.values(errors).some(
-        (error) => error !== ""
-      );
-
+    const hasErrors = Object.values(errors).some((error) => error !== "");
     if (hasErrors) return;
 
     try {
+      const response = await api.post("/auth/login", formData);
 
-      const response = await api.post(
-        "/auth/login",
-        formData
-      );
-
-      // TOKEN
       const token = response.data.token;
-
-      // USER
       const user = response.data.user;
 
-      // LOGIN GLOBAL
+      // 🔥 CORREÇÃO PRINCIPAL (ESSENCIAL)
+      localStorage.setItem("token", token);
+
+      // contexto global
       login(token, user);
 
       alert("Login realizado com sucesso");
 
-      // REDIRECIONAR
       navigate("/dashboard");
-
     } catch (error) {
-
       const mensagem =
         error.response?.data?.message ||
         "Ocorreu um erro inesperado.";
@@ -103,20 +78,12 @@ function Login() {
       setErrors({
         auth: mensagem
       });
-
     }
-
   };
 
   return (
-
     <div style={styles.container}>
-
-      <form
-        style={styles.form}
-        onSubmit={handleSubmit}
-      >
-
+      <form style={styles.form} onSubmit={handleSubmit}>
         <h1>Login</h1>
 
         {/* EMAIL */}
@@ -128,12 +95,7 @@ function Login() {
           value={formData.email}
           onChange={handleChange}
         />
-
-        {errors.email && (
-          <p style={styles.error}>
-            {errors.email}
-          </p>
-        )}
+        {errors.email && <p style={styles.error}>{errors.email}</p>}
 
         {/* SENHA */}
         <input
@@ -144,37 +106,20 @@ function Login() {
           value={formData.senha}
           onChange={handleChange}
         />
+        {errors.senha && <p style={styles.error}>{errors.senha}</p>}
 
-        {errors.senha && (
-          <p style={styles.error}>
-            {errors.senha}
-          </p>
-        )}
+        {/* ERRO GLOBAL */}
+        {errors.auth && <p style={styles.error}>{errors.auth}</p>}
 
-        {/* ERRO LOGIN */}
-        {errors.auth && (
-          <p style={styles.error}>
-            {errors.auth}
-          </p>
-        )}
-
-        <button
-          style={styles.button}
-          type="submit"
-        >
+        <button style={styles.button} type="submit">
           Entrar
         </button>
-
       </form>
-
     </div>
-
   );
-
 }
 
 const styles = {
-
   container: {
     display: "flex",
     justifyContent: "center",
@@ -190,8 +135,7 @@ const styles = {
     padding: "30px",
     background: "#fff",
     borderRadius: "10px",
-    boxShadow:
-      "0px 0px 10px rgba(0,0,0,0.1)"
+    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)"
   },
 
   input: {
@@ -210,7 +154,6 @@ const styles = {
     color: "red",
     marginBottom: "10px"
   }
-
 };
 
 export default Login;
