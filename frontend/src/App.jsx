@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CreateStudyGroup from "./pages/CreateStudyGroup";
 import EditStudyGroup from "./pages/EditStudyGroup";
+import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -47,6 +48,16 @@ function App() {
           element={
             <ProtectedRoute>
               <EditStudyGroup />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* PROFILE */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

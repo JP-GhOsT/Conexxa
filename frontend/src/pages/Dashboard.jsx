@@ -17,7 +17,7 @@ export default function Dashboard() {
       <h1>Dashboard</h1>
 
       <p>
-        Bem-vindo, {user?.nomeCompleto || "Usuário"} 👋
+        Bem-vindo, {user?.nomeCompleto ?? "Usuário"} 👋
       </p>
 
       <div style={styles.grid}>
@@ -31,7 +31,7 @@ export default function Dashboard() {
           <p>Criar novo grupo de estudo</p>
         </div>
 
-        {/* LISTAR GRUPOS */}
+        {/* GRUPOS */}
         <div
           style={styles.card}
           onClick={() => navigate("/groups")}
@@ -40,7 +40,7 @@ export default function Dashboard() {
           <p>Ver grupos disponíveis</p>
         </div>
 
-        {/* PERFIL (opcional futuro) */}
+        {/* PERFIL */}
         <div
           style={styles.card}
           onClick={() => navigate("/profile")}
