@@ -5,17 +5,28 @@ const {
   createStudyGroup,
   updateStudyGroup,
   requestJoinGroup
-} = require("../controllers/groupController");
+} = require("../controllers/studyGroupController");
 
 const authMiddleware = require("../middlewares/authMiddleware");
 
-// criar grupo
+/* =========================
+   GROUPS
+========================= */
+
+// Criar grupo (protegido)
 router.post("/study-groups", authMiddleware, createStudyGroup);
 
-// atualizar grupo
+// Atualizar grupo (PROVAVELMENTE deve ser protegido também)
 router.put("/study-groups/:id", authMiddleware, updateStudyGroup);
 
-// join request
-router.post("/:groupId/join-request", authMiddleware, requestJoinGroup);
+/* =========================
+   JOIN REQUEST
+========================= */
+
+router.post(
+  "/study-groups/:groupId/join-request",
+  authMiddleware,
+  requestJoinGroup
+);
 
 module.exports = router;
