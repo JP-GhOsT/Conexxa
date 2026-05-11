@@ -42,8 +42,7 @@ function Register() {
       if (!value.trim()) {
         error = "Senha é obrigatória";
       } else if (!senhaRegex.test(value)) {
-        error =
-          "Senha deve ter no mínimo 8 caracteres, 1 letra e 1 número";
+        error = "Senha deve ter no mínimo 8 caracteres, 1 letra e 1 número";
       }
     }
 
@@ -102,10 +101,10 @@ function Register() {
       const response = await api.post("/auth/register", formData);
 
       toast.success(
-        response.data.message ||
-          "Usuário cadastrado com sucesso!"
+        response.data.message || "Usuário cadastrado com sucesso!"
       );
 
+      // limpar form
       setFormData({
         nomeCompleto: "",
         email: "",
@@ -114,14 +113,13 @@ function Register() {
 
       setErrors({});
 
-      // redireciona para login
+      // redirecionar para login
       setTimeout(() => {
         navigate("/login");
       }, 500);
 
     } catch (error) {
       const status = error.response?.status;
-      const message = error.response?.data?.message;
 
       if (status === 409) {
         setErrors((prev) => ({
@@ -129,7 +127,9 @@ function Register() {
           email: "E-mail já cadastrado"
         }));
       } else {
-        toast.error(message || "Erro ao cadastrar usuário.");
+        toast.error(
+          error.response?.data?.message || "Erro ao cadastrar usuário."
+        );
       }
     } finally {
       setLoading(false);
@@ -149,9 +149,7 @@ function Register() {
           value={formData.nomeCompleto}
           onChange={handleChange}
         />
-        {errors.nomeCompleto && (
-          <p style={styles.error}>{errors.nomeCompleto}</p>
-        )}
+        {errors.nomeCompleto && <p style={styles.error}>{errors.nomeCompleto}</p>}
 
         <input
           style={styles.input}
@@ -161,9 +159,7 @@ function Register() {
           value={formData.email}
           onChange={handleChange}
         />
-        {errors.email && (
-          <p style={styles.error}>{errors.email}</p>
-        )}
+        {errors.email && <p style={styles.error}>{errors.email}</p>}
 
         <input
           style={styles.input}
@@ -173,11 +169,8 @@ function Register() {
           value={formData.senha}
           onChange={handleChange}
         />
-        {errors.senha && (
-          <p style={styles.error}>{errors.senha}</p>
-        )}
+        {errors.senha && <p style={styles.error}>{errors.senha}</p>}
 
-        {/* BOTÃO CADASTRAR */}
         <button
           style={styles.button}
           type="submit"
@@ -186,7 +179,6 @@ function Register() {
           {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
 
-        {/* BOTÃO LOGIN */}
         <button
           type="button"
           style={styles.loginButton}
