@@ -318,14 +318,22 @@ const getGroupRequests = (req, res) => {
   const { groupId } = req.params;
 
   db.all(
-    `SELECT gm.id, gm.user_id, gm.status, u.nomeCompleto, u.email
+    `SELECT 
+      gm.id,
+      gm.user_id,
+      gm.status,
+      u.nome_completo AS nomeCompleto,
+      u.email
      FROM group_memberships gm
      JOIN users u ON u.id = gm.user_id
      WHERE gm.group_id = ? AND gm.status = 'PENDING'`,
     [groupId],
     (err, rows) => {
       if (err) {
-        return res.status(500).json({ message: "Erro ao buscar solicitações" });
+        console.log(err);
+        return res.status(500).json({
+          message: "Erro ao buscar solicitações"
+        });
       }
 
       return res.json({
