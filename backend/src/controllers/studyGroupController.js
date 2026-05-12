@@ -1,70 +1,382 @@
 const db = require("../database/connection");
 const { v4: uuidv4 } = require("uuid");
 
-// Limite máximo opcional
-const MAX_PARTICIPANT_LIMIT = 100;
-const validLocationTypes = ["ONLINE", "PRESENTIAL"];
+const STATUS = {
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
+  CANCELLED: "CANCELLED"
+};
 
-const registerGroup = (req, res) => {
-  try {
-    const { subject, objective, locationType, participantLimit, creator_id } = req.body;
+/* =========================
+   CREATE GROUP
+========================= */
+const createStudyGroup = (req, res) => {
+  const {
+    subject,
+    objective,
+    locationType,
+    participantLimit
+  } = req.body;
 
-    // Validações obrigatórias
-    if (!subject || !subject.trim()) {
-      return res.status(400).json({ success: false, message: "subject é obrigatório" });
-    }
-    if (!objective || !objective.trim()) {
-      return res.status(400).json({ success: false, message: "objective é obrigatório" });
-    }
+  const creator_id = req.user?.id;
 
-    // Validar enum locationType
-    if (!locationType || !validLocationTypes.includes(locationType)) {
-      return res.status(400).json({ success: false, message: "locationType deve ser ONLINE ou PRESENTIAL" });
-    }
+  if (!subject || !objective) {
+    return res.status(400).json({
+      message: "Campos obrigatórios"
+    });
+  }
 
-    // Validar participantLimit
-    if (participantLimit === undefined || participantLimit === null) {
-      return res.status(400).json({ success: false, message: "participantLimit é obrigatório" });
-    }
-    const limit = Number(participantLimit);
-    if (Number.isNaN(limit) || limit <= 0) {
-      return res.status(400).json({ success: false, message: "participantLimit deve ser maior que 0" });
-    }
-    if (limit > MAX_PARTICIPANT_LIMIT) {
-      return res.status(400).json({ success: false, message: `participantLimit deve ser no máximo ${MAX_PARTICIPANT_LIMIT}` });
-    }
+  const id = uuidv4();
 
-    // Criar e salvar
-    const id = uuidv4();
-    const creator = creator_id || "temp-user-id";
+  db.run(
+    `INSERT INTO groups 
+     (id, subject, objective, location_type, participant_limit, creator_id)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      id,
+      subject,
+      objective,
+      locationType,
+      participantLimit,
+      creator_id
+    ],
+    function (err) {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro ao criar grupo"
+        });
+      }
 
-    db.run(
-      `INSERT INTO groups (id, subject, objective, location_type, participant_limit, creator_id)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [id, subject, objective, locationType, limit, creator],
-      function (err) {
-        if (err) {
-          return res.status(500).json({ success: false, message: "Erro ao salvar grupo" });
-        }
-
-        // Retorna o objeto criado com ID
-        const created = {
+      return res.status(201).json({
+        success: true,
+        group: {
           id,
           subject,
           objective,
           locationType,
-          participantLimit: limit,
-          creator_id: creator
-        };
-
-        return res.status(201).json({ success: true, group: created });
-      }
-    );
-  } catch (error) {
-    return res.status(500).json({ success: false, message: "Erro interno" });
-  }
+          participantLimit,
+          creator_id
+        }
+      });
+    }
+  );
 };
 
+/* =========================
+   GET ALL GROUPS (🔥 NOVO)
+========================= */
+const getAllStudyGroups = (req, res) => {
+  db.all(
+    `SELECT * FROM groups ORDER BY created_at DESC`,
+    [],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro ao buscar grupos"
+        });
+      }
+
+      return res.json({
+        success: true,
+        groups: rows
+      });
+    }
+  );
+};
+
+/* =========================
+   GET GROUP BY ID
+========================= */
+const getStudyGroupById = (req, res) => {
+  const { id } = req.params;
+
+  db.get(
+    `SELECT * FROM groups WHERE id = ?`,
+    [id],
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro ao buscar grupo"
+        });
+      }
+
+      if (!group) {
+        return res.status(404).json({
+          message: "Grupo não encontrado"
+        });
+      }
+
+      return res.json({
+        success: true,
+        group
+      });
+    }
+  );
+};
+
+/* =========================
+   UPDATE GROUP
+========================= */
+const updateStudyGroup = (req, res) => {
+  const { id } = req.params;
+  const {
+    subject,
+    objective,
+    locationType,
+    participantLimit
+  } = req.body;
+
+  db.run(
+    `UPDATE groups 
+     SET subject = ?, objective = ?, location_type = ?, participant_limit = ?
+     WHERE id = ?`,
+    [subject, objective, locationType, participantLimit, id],
+    function (err) {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro ao atualizar grupo"
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: "Atualizado com sucesso"
+      });
+    }
+  );
+};
+
+/* =========================
+   REQUEST JOIN GROUP
+========================= */
+const requestJoinGroup = (req, res) => {
+  const { groupId } = req.params;
+  const userId = req.user?.id;
+
+  db.get(
+    `SELECT * FROM group_memberships 
+     WHERE group_id = ? AND user_id = ?`,
+    [groupId, userId],
+    (err, row) => {
+      if (row) {
+        return res.json({
+          status: row.status,
+          message: "Já existe solicitação"
+        });
+      }
+
+      db.run(
+        `INSERT INTO group_memberships 
+         (id, group_id, user_id, status)
+         VALUES (?, ?, ?, ?)`,
+        [uuidv4(), groupId, userId, STATUS.PENDING],
+        function (err2) {
+          if (err2) {
+            return res.status(500).json({
+              message: "Erro ao solicitar entrada"
+            });
+          }
+
+          return res.status(201).json({
+            status: STATUS.PENDING
+          });
+        }
+      );
+    }
+  );
+};
+
+/* =========================
+   GET JOIN STATUS
+========================= */
+const getJoinRequestStatus = (req, res) => {
+  const { groupId } = req.params;
+  const userId = req.user?.id;
+
+  db.get(
+    `SELECT status FROM group_memberships 
+     WHERE group_id = ? AND user_id = ?`,
+    [groupId, userId],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro interno"
+        });
+      }
+
+      if (!row) {
+        return res.json({
+          status: "NONE"
+        });
+      }
+
+      return res.json({
+        status: row.status
+      });
+    }
+  );
+};
+
+/* =========================
+   ACCEPT JOIN REQUEST (ADMIN)
+========================= */
+const acceptJoinRequest = (req, res) => {
+  const { groupId, userId } = req.params;
+  const adminId = req.user?.id;
+
+  // 1. Verificar se o grupo existe e se o usuário é admin
+  db.get(
+    `SELECT * FROM groups WHERE id = ?`,
+    [groupId],
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro interno" });
+      }
+
+      if (!group) {
+        return res.status(404).json({ message: "Grupo não encontrado" });
+      }
+
+      if (group.creator_id !== adminId) {
+        return res.status(403).json({
+          message: "Apenas o criador pode aceitar pedidos"
+        });
+      }
+
+      // 2. Atualizar status para ACCEPTED
+      db.run(
+        `UPDATE group_memberships
+         SET status = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE group_id = ? AND user_id = ?`,
+        ["ACCEPTED", groupId, userId],
+        function (err2) {
+          if (err2) {
+            return res.status(500).json({
+              message: "Erro ao aceitar pedido"
+            });
+          }
+
+          return res.json({
+            success: true,
+            message: "Usuário aceito no grupo"
+          });
+        }
+      );
+    }
+  );
+};
+
+const rejectJoinRequest = (req, res) => {
+  const { groupId, userId } = req.params;
+  const adminId = req.user?.id;
+
+  // 1. verificar grupo
+  db.get(
+    `SELECT * FROM groups WHERE id = ?`,
+    [groupId],
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro interno" });
+      }
+
+      if (!group) {
+        return res.status(404).json({ message: "Grupo não encontrado" });
+      }
+
+      // 2. validar admin
+      if (group.creator_id !== adminId) {
+        return res.status(403).json({
+          message: "Apenas o criador pode rejeitar pedidos"
+        });
+      }
+
+      // 3. atualizar status pelo userId + groupId (IGUAL accept)
+      db.run(
+        `UPDATE group_memberships
+         SET status = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE group_id = ? AND user_id = ?`,
+        ["REJECTED", groupId, userId],
+        function (err2) {
+          if (err2) {
+            return res.status(500).json({
+              message: "Erro ao rejeitar pedido"
+            });
+          }
+
+          return res.json({
+            success: true,
+            message: "Usuário rejeitado no grupo"
+          });
+        }
+      );
+    }
+  );
+};
+
+const getGroupRequests = (req, res) => {
+  const { groupId } = req.params;
+
+  db.all(
+    `SELECT 
+      gm.id,
+      gm.user_id,
+      gm.status,
+      u.nome_completo AS nomeCompleto,
+      u.email
+     FROM group_memberships gm
+     JOIN users u ON u.id = gm.user_id
+     WHERE gm.group_id = ? AND gm.status = 'PENDING'`,
+    [groupId],
+    (err, rows) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({
+          message: "Erro ao buscar solicitações"
+        });
+      }
+
+      return res.json({
+        success: true,
+        requests: rows
+      });
+    }
+  );
+};
+
+const getMyAdminGroups = (req, res) => {
+  const userId = req.user?.id;
+
+  db.all(
+    `SELECT * FROM groups WHERE creator_id = ? ORDER BY created_at DESC`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro ao buscar grupos do admin"
+        });
+      }
+
+      return res.json({
+        success: true,
+        groups: rows
+      });
+    }
+  );
+};
+
+/* =========================
+   EXPORT
+========================= */
 module.exports = {
-  registerGroup,
+  createStudyGroup,
+  getAllStudyGroups, // 🔥 IMPORTANTE
+  getStudyGroupById,
+  updateStudyGroup,
+  requestJoinGroup,
+  getJoinRequestStatus,
+  acceptJoinRequest,
+  rejectJoinRequest,
+  getGroupRequests,
+  getMyAdminGroups
 };

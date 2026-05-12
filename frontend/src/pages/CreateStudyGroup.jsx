@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 export default function CreateStudyGroup() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     subject: "",
     objective: "",
@@ -17,15 +20,12 @@ export default function CreateStudyGroup() {
     setForm((prev) => ({
       ...prev,
       [name]:
-        name === "participantLimit"
-          ? Number(value)
-          : value,
+        name === "participantLimit" ? Number(value) : value,
     }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     setLoading(true);
 
     try {
@@ -34,9 +34,8 @@ export default function CreateStudyGroup() {
         form
       );
 
-      alert(data.message || "Grupo criado!");
+      alert(data.message || "Grupo criado com sucesso!");
 
-      // reset form
       setForm({
         subject: "",
         objective: "",
@@ -46,101 +45,160 @@ export default function CreateStudyGroup() {
 
     } catch (error) {
       console.error(error);
-
-      alert(
-        error.response?.data?.message ||
-        "Erro ao criar grupo"
-      );
+      alert(error.response?.data?.message || "Erro ao criar grupo");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div style={styles.container}>
-      <h2>Criar Grupo de Estudo</h2>
+    <div style={styles.page}>
 
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <div style={styles.card}>
 
-        {/* MATÉRIA */}
-        <input
-          name="subject"
-          placeholder="Matéria"
-          value={form.subject}
-          onChange={handleChange}
-          style={styles.input}
-        />
+        {/* HEADER */}
+        <div style={styles.header}>
+          <button
+            style={styles.backButton}
+            onClick={() => navigate("/dashboard")}
+          >
+            ⬅ Voltar
+          </button>
 
-        {/* OBJETIVO */}
-        <textarea
-          name="objective"
-          placeholder="Objetivo do grupo"
-          value={form.objective}
-          onChange={handleChange}
-          style={styles.textarea}
-        />
+          <h2 style={styles.title}>
+            📚 Criar Grupo de Estudo
+          </h2>
+        </div>
 
-        {/* LOCAL */}
-        <select
-          name="locationType"
-          value={form.locationType}
-          onChange={handleChange}
-          style={styles.input}
-        >
-          <option value="ONLINE">Online</option>
-          <option value="PRESENTIAL">Presencial</option>
-        </select>
+        <form onSubmit={handleSubmit} style={styles.form}>
 
-        {/* LIMITE */}
-        <input
-          type="number"
-          name="participantLimit"
-          value={form.participantLimit}
-          onChange={handleChange}
-          min="1"
-          style={styles.input}
-        />
+          <input
+            name="subject"
+            placeholder="Matéria (ex: Matemática)"
+            value={form.subject}
+            onChange={handleChange}
+            style={styles.input}
+          />
 
-        {/* BOTÃO */}
-        <button
-          type="submit"
-          disabled={loading}
-          style={styles.button}
-        >
-          {loading ? "Criando..." : "Criar Grupo"}
-        </button>
+          <textarea
+            name="objective"
+            placeholder="Objetivo do grupo..."
+            value={form.objective}
+            onChange={handleChange}
+            style={styles.textarea}
+          />
 
-      </form>
+          <select
+            name="locationType"
+            value={form.locationType}
+            onChange={handleChange}
+            style={styles.input}
+          >
+            <option value="ONLINE">Online</option>
+            <option value="PRESENTIAL">Presencial</option>
+          </select>
+
+          <input
+            type="number"
+            name="participantLimit"
+            value={form.participantLimit}
+            onChange={handleChange}
+            min="1"
+            style={styles.input}
+          />
+
+          <button
+            disabled={loading}
+            style={styles.button}
+          >
+            {loading ? "Criando..." : "Criar Grupo"}
+          </button>
+
+        </form>
+
+      </div>
+
     </div>
   );
 }
 
+/* =========================
+   STYLES
+========================= */
 const styles = {
-  container: {
-    maxWidth: 500,
-    margin: "50px auto",
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "linear-gradient(135deg, #f5f7fa, #c3cfe2)",
     padding: 20,
-    fontFamily: "Arial",
+    fontFamily: "Arial"
   },
+
+  card: {
+    width: "100%",
+    maxWidth: 500,
+    background: "#fff",
+    padding: 30,
+    borderRadius: 16,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+  },
+
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20
+  },
+
+  backButton: {
+    padding: "8px 12px",
+    border: "none",
+    borderRadius: 8,
+    background: "#007bff",
+    color: "#fff",
+    cursor: "pointer",
+    fontWeight: "bold"
+  },
+
+  title: {
+    margin: 0,
+    fontSize: 18
+  },
+
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: 10,
+    gap: 12
   },
+
   input: {
-    padding: 10,
-    fontSize: 14,
-  },
-  textarea: {
-    padding: 10,
-    fontSize: 14,
-    minHeight: 80,
-  },
-  button: {
     padding: 12,
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
+    borderRadius: 8,
+    border: "1px solid #ddd",
+    fontSize: 14,
+    outline: "none"
   },
+
+  textarea: {
+    padding: 12,
+    borderRadius: 8,
+    border: "1px solid #ddd",
+    fontSize: 14,
+    minHeight: 100,
+    resize: "none",
+    outline: "none"
+  },
+
+  button: {
+    marginTop: 10,
+    padding: 14,
+    border: "none",
+    borderRadius: 8,
+    background: "#4CAF50",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer"
+  }
 };

@@ -1,34 +1,36 @@
 const db = require("../database/connection");
 
-db.run(`
-  CREATE TABLE IF NOT EXISTS groups (
-    id TEXT PRIMARY KEY,
+db.serialize(() => {
 
-    subject VARCHAR(255) NOT NULL,
+  db.run(`
 
-    objective TEXT NOT NULL,
+    CREATE TABLE IF NOT EXISTS groups (
 
-    location_type TEXT NOT NULL
-    CHECK (
-      location_type IN (
-        'ONLINE',
-        'PRESENTIAL'
-      )
-    ),
+      id TEXT PRIMARY KEY,
 
-    participant_limit INTEGER NOT NULL,
+      subject TEXT NOT NULL,
 
-    creator_id TEXT NOT NULL,
+      objective TEXT NOT NULL,
 
-    created_at DATETIME
-    DEFAULT CURRENT_TIMESTAMP,
+      location_type TEXT NOT NULL
+      CHECK(location_type IN ('ONLINE', 'PRESENTIAL')),
 
-    updated_at DATETIME
-    DEFAULT CURRENT_TIMESTAMP,
+      participant_limit INTEGER NOT NULL
+      CHECK(participant_limit > 0),
 
-    FOREIGN KEY (creator_id)
-    REFERENCES users(id)
-  )
-`);
+      creator_id TEXT NOT NULL,
+
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+      FOREIGN KEY (creator_id)
+      REFERENCES users(id)
+
+    )
+
+  `);
+
+});
 
 module.exports = db;

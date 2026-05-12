@@ -4,14 +4,20 @@ const api = axios.create({
   baseURL: "http://localhost:3000",
 });
 
-export default api;
+/* =========================
+   INTERCEPTOR CORRIGIDO
+========================= */
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("@connexa_token");
 
-// funções separadas (opcional)
-export const cadastrarUsuario = async (dados) => {
-  try {
-    const response = await api.post("/usuarios/cadastro", dados);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { message: "Erro inesperado" };
+  if (token) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
+    };
   }
-};
+
+  return config;
+});
+
+export default api;

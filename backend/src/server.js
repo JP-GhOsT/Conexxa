@@ -1,30 +1,54 @@
 const express = require("express");
+
 const cors = require("cors");
-require("dotenv").config();
-
-require("./models/userModel");
-require("./models/groupModel");
-require("./models/groupMembershipModel");
-
-const authRoutes = require("./routes/authRoutes");
-const studyGroupRoutes = require("./routes/studyGroupRoutes");
-const usuariosRoutes = require("./routes/usuariosRoutes");
 
 const app = express();
 
+/* =========================
+   MIDDLEWARES
+========================= */
+
+// CORS
 app.use(cors());
+
+// JSON
 app.use(express.json());
 
-// ROTAS
+/* =========================
+   MODELS
+========================= */
+
+// Inicializar tabelas
+require("./models/userModel");
+
+require("./models/groupModel");
+
+require("./models/groupMembershipModel");
+
+/* =========================
+   ROUTES
+========================= */
+
+const authRoutes =
+  require("./routes/authRoutes");
+
+const studyGroupRoutes =
+  require("./routes/studyGroupRoutes");
+
+// AUTH
 app.use("/auth", authRoutes);
+
+// GROUPS
 app.use("/groups", studyGroupRoutes);
-app.use("/api/usuarios", usuariosRoutes);
 
-const PORT = process.env.PORT || 3000;
+/* =========================
+   SERVER
+========================= */
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+app.listen(3000, () => {
+
+  console.log(
+    "Servidor rodando na porta 3000"
+  );
+
 });
-
-const usuariosRoutes = require("./routes/usuariosRoutes");
-app.use("/api", usuariosRoutes);

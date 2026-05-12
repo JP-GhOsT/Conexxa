@@ -6,15 +6,28 @@ import { toast } from "react-toastify";
 function EditStudyGroup() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [grupo, setGrupo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Buscar dados do grupo
+  /* =========================
+     BUSCAR GRUPO
+  ========================= */
   useEffect(() => {
     api
-      .get(`/study-groups/${id}`)
+      .get(`/groups/study-groups/${id}`)
       .then((res) => {
-        setGrupo(res.data.group);
+        const g = res.data.group;
+
+        // 🔥 NORMALIZAÇÃO (IMPORTANTE)
+        setGrupo({
+          id: g.id,
+          subject: g.subject,
+          objective: g.objective,
+          locationType: g.location_type,
+          participantLimit: g.participant_limit
+        });
+
         setLoading(false);
       })
       .catch(() => {
@@ -23,20 +36,39 @@ function EditStudyGroup() {
       });
   }, [id]);
 
-  // Atualizar grupo
+  /* =========================
+     ATUALIZAR GRUPO
+  ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await api.put(`/study-groups/${id}`, grupo);
-      toast.success(response.data.message);
-      navigate(`/grupos/${id}`);
-    } catch {
+      const response = await api.put(
+        `/groups/study-groups/${id}`,
+        {
+          subject: grupo.subject,
+          objective: grupo.objective,
+          locationType: grupo.locationType,
+          participantLimit: grupo.participantLimit
+        }
+      );
+
+      toast.success(response.data.message || "Grupo atualizado com sucesso");
+
+      navigate(`/groups/${id}`);
+    } catch (err) {
       toast.error("Erro ao atualizar grupo");
     }
   };
 
+  /* =========================
+     HANDLE INPUT
+  ========================= */
   const handleChange = (e) => {
-    setGrupo({ ...grupo, [e.target.name]: e.target.value });
+    setGrupo({
+      ...grupo,
+      [e.target.name]: e.target.value
+    });
   };
 
   if (loading) return <p>Carregando...</p>;
@@ -44,37 +76,49 @@ function EditStudyGroup() {
 
   return (
     <div style={styles.container}>
+
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        style={styles.backButton}
+      >
+        ⬅ Voltar
+      </button>
+
       <form style={styles.form} onSubmit={handleSubmit}>
         <h2>Editar Grupo de Estudo</h2>
 
         <input
           style={styles.input}
           name="subject"
-          value={grupo.subject}
+          value={grupo.subject || ""}
           onChange={handleChange}
           placeholder="Matéria"
         />
+
         <input
           style={styles.input}
           name="objective"
-          value={grupo.objective}
+          value={grupo.objective || ""}
           onChange={handleChange}
           placeholder="Objetivo"
         />
+
         <select
           style={styles.input}
           name="locationType"
-          value={grupo.locationType}
+          value={grupo.locationType || "ONLINE"}
           onChange={handleChange}
         >
           <option value="ONLINE">Online</option>
           <option value="PRESENTIAL">Presencial</option>
         </select>
+
         <input
           style={styles.input}
           type="number"
           name="participantLimit"
-          value={grupo.participantLimit}
+          value={grupo.participantLimit || 1}
           onChange={handleChange}
           placeholder="Limite de participantes"
         />
@@ -90,11 +134,26 @@ function EditStudyGroup() {
 const styles = {
   container: {
     display: "flex",
-    justifyContent: "center",
+    flexDirection: "column",
     alignItems: "center",
-    height: "100vh",
+    justifyContent: "center",
+    minHeight: "100vh",
     background: "#f5f5f5",
+    padding: "20px"
   },
+
+  backButton: {
+    alignSelf: "flex-start",
+    marginBottom: "15px",
+    padding: "10px 15px",
+    background: "#6c757d",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold"
+  },
+
   form: {
     display: "flex",
     flexDirection: "column",
@@ -102,18 +161,24 @@ const styles = {
     padding: "30px",
     background: "#fff",
     borderRadius: "10px",
-    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)"
   },
+
   input: {
     marginBottom: "10px",
     padding: "12px",
-    fontSize: "16px",
+    fontSize: "16px"
   },
+
   button: {
     padding: "12px",
     fontSize: "16px",
     cursor: "pointer",
-  },
+    background: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px"
+  }
 };
 
 export default EditStudyGroup;

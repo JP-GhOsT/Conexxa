@@ -1,233 +1,108 @@
 const db = require("../database/connection");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 
 require("dotenv").config();
 
-const register = async (req, res) => {
+/* =========================
+   REGISTER
+========================= */
+const register = (req, res) => {
+  const { nomeCompleto, email, senha } = req.body;
 
-  try {
+  if (!nomeCompleto || !email || !senha) {
+    return res.status(400).json({ message: "Campos obrigatórios" });
+  }
 
-    const { nome_completo, email, senha } = req.body;
-
-    // VALIDAR NOME
-    if (!nome_completo || nome_completo.trim() === "") {
-      return res.status(400).json({
-        success: false,
-        message: "Nome é obrigatório"
-      });
+  db.get("SELECT id FROM users WHERE email = ?", [email], async (err, user) => {
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).json({ message: "Erro no banco", error: err.message });
     }
 
-    // VALIDAR EMAIL
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email || !emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "E-mail inválido"
-      });
+    if (user) {
+      return res.status(409).json({ message: "Email já cadastrado" });
     }
 
-    // VALIDAR SENHA
-    const senhaSegura =
-      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+    const hashedPassword = await bcrypt.hash(senha, 10);
+    const id = uuidv4();
 
-    if (!senha || !senhaSegura.test(senha)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "A senha deve ter no mínimo 8 caracteres, uma letra e um número"
-      });
-    }
-
-    // VERIFICAR SE EMAIL JÁ EXISTE
-    db.get(
-      `
-      SELECT * FROM users WHERE email = ?
-      `,
-      [email],
-      async (err, existingUser) => {
-
-        if (err) {
-          return res.status(500).json({
-            success: false,
-            message: "Erro interno"
-          });
+    db.run(
+      `INSERT INTO users (id, nome_completo, email, senha_hash)
+       VALUES (?, ?, ?, ?)`,
+      [id, nomeCompleto, email, hashedPassword],
+      function (insertErr) {
+        if (insertErr) {
+          console.log("SQL ERROR REGISTER:", insertErr);
+          return res.status(500).json({ message: "Erro ao criar usuário", error: insertErr.message });
         }
 
-        // EMAIL JÁ EXISTE
-        if (existingUser) {
-          return res.status(409).json({
-            success: false,
-            message: "E-mail já cadastrado"
-          });
-        }
-
-        // HASH DA SENHA
-        const senha_hash = await bcrypt.hash(
-          senha,
-          10
-        );
-
-        const id = uuidv4();
-
-        // CRIAR USUÁRIO
-        db.run(
-          `
-          INSERT INTO users (
-            id,
-            nome_completo,
-            email,
-            senha_hash
-          )
-          VALUES (?, ?, ?, ?)
-          `,
-          [
-            id,
-            nome_completo,
-            email,
-            senha_hash
-          ],
-          function (insertErr) {
-
-            if (insertErr) {
-              return res.status(500).json({
-                success: false,
-                message: "Erro ao criar usuário"
-              });
-            }
-
-            // GERAR JWT
-            const token = jwt.sign(
-              {
-                id,
-                email
-              },
-              process.env.JWT_SECRET,
-              {
-                expiresIn: "1d"
-              }
-            );
-
-            // RETORNAR TOKEN + DADOS
-            return res.status(201).json({
-              success: true,
-              message: "Usuário criado com sucesso",
-              token,
-              user: {
-                id,
-                nome_completo,
-                email
-              }
-            });
-
-          }
-        );
-
+        return res.status(201).json({
+          success: true,
+          user: { id, nomeCompleto, email }
+        });
       }
     );
-
-  } catch (error) {
-
-    return res.status(500).json({
-      success: false,
-      message: "Erro interno"
-    });
-
-  }
-
+  });
 };
 
+/* =========================
+   LOGIN
+========================= */
 const login = (req, res) => {
-
   const { email, senha } = req.body;
 
-  // VALIDAR CAMPOS
-  if (!email || !senha) {
+  db.get("SELECT * FROM users WHERE email = ?", [email], async (err, user) => {
+    if (err) {
+      console.log("SQL ERROR:", err);
+      return res.status(500).json({ message: "Erro no banco", error: err.message });
+    }
 
-    return res.status(400).json({
-      success: false,
-      message: "E-mail e senha são obrigatórios"
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    const valid = await bcrypt.compare(senha, user.senha_hash);
+    if (!valid) {
+      return res.status(401).json({ message: "Senha inválida" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    return res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        nomeCompleto: user.nome_completo,
+        email: user.email
+      }
     });
+  });
+};
 
+/* =========================
+   MIDDLEWARE DE AUTENTICAÇÃO
+========================= */
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(403).json({ message: "Sem permissão: token não fornecido" });
   }
 
-  // BUSCAR USUÁRIO
-  db.get(
-    `
-    SELECT * FROM users
-    WHERE email = ?
-    `,
-    [email],
-    async (err, user) => {
-
-      if (err) {
-
-        return res.status(500).json({
-          success: false,
-          message: "Erro interno"
-        });
-
-      }
-
-      // USUÁRIO NÃO EXISTE
-      if (!user) {
-
-        return res.status(401).json({
-          success: false,
-          message: "E-mail ou senha inválidos"
-        });
-
-      }
-
-      // COMPARAR SENHA
-      const senhaValida =
-        await bcrypt.compare(
-          senha,
-          user.senha_hash
-        );
-
-      // SENHA ERRADA
-      if (!senhaValida) {
-
-        return res.status(401).json({
-          success: false,
-          message: "E-mail ou senha inválidos"
-        });
-
-      }
-
-      // GERAR TOKEN
-      const token = jwt.sign(
-        {
-          id: user.id,
-          email: user.email
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1d"
-        }
-      );
-
-      // RETORNAR
-      return res.json({
-        success: true,
-        token,
-        user: {
-          id: user.id,
-          nome_completo:
-            user.nome_completo,
-          email: user.email
-        }
-      });
-
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: "Token inválido ou expirado" });
     }
-  );
-
+    req.user = decoded;
+    next();
+  });
 };
 
-module.exports = {
-  register,
-  login
-};
+module.exports = { register, login, authenticate };

@@ -1,28 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import api from "../services/api";
 import { toast } from "react-toastify";
 
 function Register() {
   const [formData, setFormData] = useState({
-    nome_completo: "",
+    nomeCompleto: "",
     email: "",
     senha: ""
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
+  /* =========================
+     VALIDAR CAMPOS
+  ========================= */
   const validateField = (name, value) => {
     let error = "";
 
-    if (name === "nome_completo" && !value.trim()) {
-      error = "Nome é obrigatório";
+    if (name === "nomeCompleto") {
+      if (!value.trim()) error = "Nome é obrigatório";
     }
 
     if (name === "email") {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
       if (!value.trim()) {
         error = "E-mail é obrigatório";
       } else if (!emailRegex.test(value)) {
@@ -32,6 +38,7 @@ function Register() {
 
     if (name === "senha") {
       const senhaRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+
       if (!value.trim()) {
         error = "Senha é obrigatória";
       } else if (!senhaRegex.test(value)) {
@@ -39,68 +46,90 @@ function Register() {
       }
     }
 
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error
+    }));
+
     return error === "";
   };
 
+  /* =========================
+     VALIDAR TUDO
+  ========================= */
   const validateAll = () => {
-    const fields = ["nome_completo", "email", "senha"];
+    const fields = ["nomeCompleto", "email", "senha"];
+
     let ok = true;
-    fields.forEach((f) => {
-      const valid = validateField(f, formData[f] ?? "");
+
+    fields.forEach((field) => {
+      const valid = validateField(field, formData[field] ?? "");
       if (!valid) ok = false;
     });
+
     return ok;
   };
 
-  // HANDLE INPUT
+  /* =========================
+     HANDLE INPUT
+  ========================= */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+
     validateField(name, value);
   };
 
-  // SUBMIT
+  /* =========================
+     SUBMIT
+  ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateAll()) {
-      toast.error("Corrija os erros do formulário antes de enviar.");
+      toast.error("Corrija os erros antes de enviar.");
       return;
     }
 
     setLoading(true);
+
     try {
-      // Ajuste a rota abaixo se seu backend usar /api/usuarios/cadastro
       const response = await api.post("/auth/register", formData);
 
-      // Toast de sucesso (usa mensagem do backend se houver)
-      toast.success(response.data.message || "Usuário cadastrado com sucesso!");
+      toast.success(
+        response.data.message || "Usuário cadastrado com sucesso!"
+      );
 
-      // Backend sugerido retorna userId; ajuste se o seu retornar outro campo
-      const userId = response.data.userId || response.data.id || response.data.user?.id;
-      if (userId) {
-        navigate(`/perfil/${userId}`);
-      } else if (response.data.grupoId) {
-        // fallback caso backend retorne grupoId por design
-        navigate(`/grupos/${response.data.grupoId}`);
-      } else {
-        navigate("/");
-      }
+      // limpar form
+      setFormData({
+        nomeCompleto: "",
+        email: "",
+        senha: ""
+      });
 
-      // Limpar formulário
-      setFormData({ nome_completo: "", email: "", senha: "" });
       setErrors({});
+
+      // redirecionar para login
+      setTimeout(() => {
+        navigate("/login");
+      }, 500);
+
     } catch (error) {
       const status = error.response?.status;
-      const msg = error.response?.data?.message;
 
       if (status === 409) {
-        setErrors((prev) => ({ ...prev, email: "E-mail já cadastrado" }));
-      } else if (msg) {
-        toast.error(msg);
+        setErrors((prev) => ({
+          ...prev,
+          email: "E-mail já cadastrado"
+        }));
       } else {
-        toast.error("Erro ao cadastrar usuário.");
+        toast.error(
+          error.response?.data?.message || "Erro ao cadastrar usuário."
+        );
       }
     } finally {
       setLoading(false);
@@ -115,12 +144,12 @@ function Register() {
         <input
           style={styles.input}
           type="text"
-          name="nome_completo"
+          name="nomeCompleto"
           placeholder="Nome completo"
-          value={formData.nome_completo}
+          value={formData.nomeCompleto}
           onChange={handleChange}
         />
-        {errors.nome_completo && <p style={styles.error}>{errors.nome_completo}</p>}
+        {errors.nomeCompleto && <p style={styles.error}>{errors.nomeCompleto}</p>}
 
         <input
           style={styles.input}
@@ -142,14 +171,29 @@ function Register() {
         />
         {errors.senha && <p style={styles.error}>{errors.senha}</p>}
 
-        <button style={styles.button} type="submit" disabled={loading}>
+        <button
+          style={styles.button}
+          type="submit"
+          disabled={loading}
+        >
           {loading ? "Cadastrando..." : "Cadastrar"}
+        </button>
+
+        <button
+          type="button"
+          style={styles.loginButton}
+          onClick={() => navigate("/login")}
+        >
+          Já tenho conta
         </button>
       </form>
     </div>
   );
 }
 
+/* =========================
+   STYLES
+========================= */
 const styles = {
   container: {
     display: "flex",
@@ -158,6 +202,7 @@ const styles = {
     height: "100vh",
     background: "#f5f5f5"
   },
+
   form: {
     display: "flex",
     flexDirection: "column",
@@ -167,16 +212,35 @@ const styles = {
     borderRadius: "10px",
     boxShadow: "0px 0px 10px rgba(0,0,0,0.1)"
   },
+
   input: {
     marginBottom: "10px",
     padding: "12px",
     fontSize: "16px"
   },
+
   button: {
     padding: "12px",
     fontSize: "16px",
-    cursor: "pointer"
+    cursor: "pointer",
+    background: "#28a745",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    marginTop: "10px"
   },
+
+  loginButton: {
+    marginTop: "10px",
+    padding: "12px",
+    fontSize: "16px",
+    cursor: "pointer",
+    background: "transparent",
+    border: "1px solid #007bff",
+    color: "#007bff",
+    borderRadius: "6px"
+  },
+
   error: {
     color: "red",
     marginBottom: "10px"
