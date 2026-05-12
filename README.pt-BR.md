@@ -2,7 +2,6 @@
 
 - 🇺🇸 English version: [English README](./README.md)
 
----
 Sistema full stack para criação e gerenciamento de grupos de estudo, com autenticação, solicitações de entrada e painel administrativo.
 
 ---
