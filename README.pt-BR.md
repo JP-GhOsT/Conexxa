@@ -152,14 +152,21 @@ npm run dev
 
 ## 👨‍💻 Equipe
 
-- João Paulo Zimmermann Matsui
-- Gustavo Sena de Souza
-- Robson Damasceno
-- Caio Gregório
-- Diego Mathias
+- João Paulo Zimmermann Matsui - [GitHub](https://github.com/JP-GhOsT) | [Linkedin](https://linkedin.com/in/joaomatsui)
+- Gustavo Sena de Souza - [GitHub](https://github.com/gustavosena025-dotcom) | [Linkedin](https://www.linkedin.com/in/gustavo-sena-ads-ia/)
+- Robson dos Santos Damasceno Lisboa - [GitHub](https://github.com/RobsonDamsceno) | [Linkedin](https://www.linkedin.com/in/robson-damasceno-b35954356/)
+- Caio dos Santos Gregorio da Rocha - [GitHub](https://github.com/caioogregorio) | [Linkedin](https://www.linkedin.com/in/caioogregorio/)
+- Diego Mathias da Fonseca - [GitHub](https://github.com/diegomathiasdev) | [Linkedin](https://www.linkedin.com/in/diegomathiasdafonseca/)
 
 ---
 
 ## ⭐ Observação
 
 Este projeto foi desenvolvido com foco acadêmico, aplicando boas práticas de desenvolvimento full stack e arquitetura moderna de aplicações web.
+
+---
+
+**Project:** Conexxa
+**Platform:** Azure DevOps
+**Integration:** Azure DevOps MCP + AI Assistant
+
