@@ -13,6 +13,8 @@ import GroupDetails from "./pages/GroupDetails";
 import EditStudyGroup from "./pages/EditStudyGroup";
 import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
+import GroupRequests from "./pages/GroupRequests";
+import AdminGroups from "./pages/AdminGroups";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -64,6 +66,25 @@ function App() {
           element={
             <ProtectedRoute>
               <GroupDetails />
+            </ProtectedRoute>
+          }
+        />
+  
+        {/* GROUP REQUESTS */}
+          <Route
+            path="/groups/:id/requests"
+            element={
+              <ProtectedRoute>
+                <GroupRequests />
+              </ProtectedRoute>
+            }
+          />
+
+        <Route
+          path="/admin/groups"
+          element={
+            <ProtectedRoute>
+              <AdminGroups />
             </ProtectedRoute>
           }
         />

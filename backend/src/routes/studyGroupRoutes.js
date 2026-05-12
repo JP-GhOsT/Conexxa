@@ -10,6 +10,7 @@ const {
   getJoinRequestStatus,
   acceptJoinRequest,
   rejectJoinRequest,
+  getMyAdminGroups,
   getGroupRequests
 } = require("../controllers/studyGroupController");
 
@@ -47,6 +48,12 @@ router.patch(
   "/study-groups/:groupId/requests/:userId/accept",
   authMiddleware,
   acceptJoinRequest
+);
+
+router.get(
+  "/my-admin-groups",
+  authMiddleware,
+  getMyAdminGroups
 );
 
 router.patch(

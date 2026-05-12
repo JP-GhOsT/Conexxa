@@ -20,6 +20,9 @@ export default function Dashboard() {
         Bem-vindo, {user?.nomeCompleto || "Usuário"} 👋
       </p>
 
+      {/* =========================
+          GRID PRINCIPAL
+      ========================= */}
       <div style={styles.grid}>
 
         {/* =========================
@@ -34,8 +37,7 @@ export default function Dashboard() {
         </div>
 
         {/* =========================
-            VER GRUPOS (LISTA OU DETALHES)
-            AQUI você pode depois trocar por API
+            LISTAR GRUPOS
         ========================= */}
         <div
           style={styles.card}
@@ -43,6 +45,17 @@ export default function Dashboard() {
         >
           <h2>📚 Grupos</h2>
           <p>Ver grupos disponíveis</p>
+        </div>
+
+        {/* =========================
+            ADMIN GRUPOS (NOVO)
+        ========================= */}
+        <div
+          style={styles.card}
+          onClick={() => navigate("/admin/groups")}
+        >
+          <h2>⚙️ Meus Grupos</h2>
+          <p>Gerenciar grupos que você criou</p>
         </div>
 
         {/* =========================

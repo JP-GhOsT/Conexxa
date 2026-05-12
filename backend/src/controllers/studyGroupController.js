@@ -336,6 +336,27 @@ const getGroupRequests = (req, res) => {
   );
 };
 
+const getMyAdminGroups = (req, res) => {
+  const userId = req.user?.id;
+
+  db.all(
+    `SELECT * FROM groups WHERE creator_id = ? ORDER BY created_at DESC`,
+    [userId],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Erro ao buscar grupos do admin"
+        });
+      }
+
+      return res.json({
+        success: true,
+        groups: rows
+      });
+    }
+  );
+};
+
 /* =========================
    EXPORT
 ========================= */
@@ -348,5 +369,6 @@ module.exports = {
   getJoinRequestStatus,
   acceptJoinRequest,
   rejectJoinRequest,
-  getGroupRequests
+  getGroupRequests,
+  getMyAdminGroups
 };

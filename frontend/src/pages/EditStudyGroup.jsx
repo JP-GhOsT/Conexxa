@@ -33,13 +33,16 @@ function EditStudyGroup() {
     e.preventDefault();
 
     try {
-      const response = await api.put(`/groups/study-groups/${id}`, grupo);
+      const response = await api.put(
+        `/groups/study-groups/${id}`,
+        grupo
+      );
 
-      toast.success(response.data.message || "Grupo atualizado com sucesso");
+      toast.success(
+        response.data.message || "Grupo atualizado com sucesso"
+      );
 
-      // ✅ CORREÇÃO AQUI (rota correta)
       navigate(`/groups/${id}`);
-
     } catch (err) {
       toast.error("Erro ao atualizar grupo");
     }
@@ -66,6 +69,16 @@ function EditStudyGroup() {
   ========================= */
   return (
     <div style={styles.container}>
+
+      {/* 🔙 BOTÃO VOLTAR */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        style={styles.backButton}
+      >
+        ⬅ Voltar
+      </button>
+
       <form style={styles.form} onSubmit={handleSubmit}>
         <h2>Editar Grupo de Estudo</h2>
 
@@ -118,11 +131,26 @@ function EditStudyGroup() {
 const styles = {
   container: {
     display: "flex",
-    justifyContent: "center",
+    flexDirection: "column",
     alignItems: "center",
-    height: "100vh",
+    justifyContent: "center",
+    minHeight: "100vh",
     background: "#f5f5f5",
+    padding: "20px"
   },
+
+  backButton: {
+    alignSelf: "flex-start",
+    marginBottom: "15px",
+    padding: "10px 15px",
+    background: "#6c757d",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold"
+  },
+
   form: {
     display: "flex",
     flexDirection: "column",
@@ -130,13 +158,15 @@ const styles = {
     padding: "30px",
     background: "#fff",
     borderRadius: "10px",
-    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)"
   },
+
   input: {
     marginBottom: "10px",
     padding: "12px",
-    fontSize: "16px",
+    fontSize: "16px"
   },
+
   button: {
     padding: "12px",
     fontSize: "16px",
@@ -144,8 +174,8 @@ const styles = {
     background: "#007bff",
     color: "#fff",
     border: "none",
-    borderRadius: "6px",
-  },
+    borderRadius: "6px"
+  }
 };
 
 export default EditStudyGroup;
