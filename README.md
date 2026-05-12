@@ -140,6 +140,23 @@ npm run dev
 - Caio dos Santos Gregorio da Rocha - [GitHub](https://github.com/caioogregorio) | [Linkedin](https://www.linkedin.com/in/caioogregorio/)
 - Diego Mathias da Fonseca - [GitHub](https://github.com/diegomathiasdev) | [Linkedin](https://www.linkedin.com/in/diegomathiasdafonseca/)
 
+
+---
+
+## 📌 Project Info
+
+- **Project:** Conexxa  
+- **Type:** Full-stack academic project  
+- **Stack:** React + Node.js + SQLite  
+- **Architecture:** REST API + JWT Authentication  
+- **Integration:** Azure DevOps MCP + AI Assistant  
+
+---
+
+## ⭐ Final Note
+
+This project demonstrates practical full-stack development skills, including authentication, REST API design, database modeling, and frontend-backend integration.
+
 ---
 
 **Project:** Conexxa
