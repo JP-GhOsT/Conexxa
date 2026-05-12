@@ -1,4 +1,15 @@
 {
+  "name": "conexxa-backend",
+  "version": "1.0.0",
+  "description": "Conexxa backend API",
+  "main": "src/server.js",
+  "type": "commonjs",
+
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
@@ -9,23 +20,8 @@
     "sqlite3": "^6.0.1",
     "uuid": "^14.0.0"
   },
-  "name": "conexxa",
-  "version": "1.0.0",
-  "description": "🇺🇸 For the English version, see [README.md](README.md)",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JP-GhOsT/Conexxa.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/JP-GhOsT/Conexxa/issues"
-  },
-  "homepage": "https://github.com/JP-GhOsT/Conexxa#readme"
+
+  "engines": {
+    "node": ">=20"
+  }
 }

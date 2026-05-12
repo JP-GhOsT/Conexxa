@@ -9,7 +9,12 @@ const app = express();
 ========================= */
 
 // CORS
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://SEU-FRONTEND.onrender.com"
+  ]
+}));
 
 // JSON
 app.use(express.json());
@@ -45,10 +50,8 @@ app.use("/groups", studyGroupRoutes);
    SERVER
 ========================= */
 
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
 
-  console.log(
-    "Servidor rodando na porta 3000"
-  );
-
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
