@@ -12,7 +12,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://SEU-FRONTEND.onrender.com"
+    "https://conexxa-1.onrender.com"
   ]
 }));
 
