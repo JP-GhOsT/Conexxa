@@ -267,6 +267,53 @@ const acceptJoinRequest = (req, res) => {
   );
 };
 
+const rejectJoinRequest = (req, res) => {
+  const { groupId, userId } = req.params;
+  const adminId = req.user?.id;
+
+  // 1. verificar grupo
+  db.get(
+    `SELECT * FROM groups WHERE id = ?`,
+    [groupId],
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro interno" });
+      }
+
+      if (!group) {
+        return res.status(404).json({ message: "Grupo não encontrado" });
+      }
+
+      // 2. validar admin
+      if (group.creator_id !== adminId) {
+        return res.status(403).json({
+          message: "Apenas o criador pode rejeitar pedidos"
+        });
+      }
+
+      // 3. atualizar status pelo userId + groupId (IGUAL accept)
+      db.run(
+        `UPDATE group_memberships
+         SET status = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE group_id = ? AND user_id = ?`,
+        ["REJECTED", groupId, userId],
+        function (err2) {
+          if (err2) {
+            return res.status(500).json({
+              message: "Erro ao rejeitar pedido"
+            });
+          }
+
+          return res.json({
+            success: true,
+            message: "Usuário rejeitado no grupo"
+          });
+        }
+      );
+    }
+  );
+};
+
 /* =========================
    EXPORT
 ========================= */
@@ -277,5 +324,6 @@ module.exports = {
   updateStudyGroup,
   requestJoinGroup,
   getJoinRequestStatus,
-  acceptJoinRequest
+  acceptJoinRequest,
+  rejectJoinRequest
 };

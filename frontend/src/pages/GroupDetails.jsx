@@ -1,62 +1,40 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-
-const API = "http://localhost:3000/groups";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function GroupDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [group, setGroup] = useState(null);
   const [status, setStatus] = useState("NONE");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
-  const token = localStorage.getItem("token");
-
   /* =========================
-     FETCH GROUP
+     CARREGAR DADOS
   ========================= */
-  const fetchGroup = async () => {
-    try {
-      const res = await fetch(`${API}/study-groups/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [groupRes, statusRes] = await Promise.all([
+          api.get(`/groups/study-groups/${id}`),
+          api.get(`/groups/study-groups/${id}/join-request-status`)
+        ]);
 
-      if (!res.ok) throw new Error("Erro ao buscar grupo");
+        setGroup(groupRes.data.group);
+        setStatus(statusRes.data.status || "NONE");
 
-      const data = await res.json();
-      setGroup(data.group);
-    } catch (err) {
-      console.log("fetchGroup error:", err);
-    }
-  };
+      } catch (err) {
+        console.log("Erro ao carregar grupo:", err);
+        setGroup(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  /* =========================
-     FETCH STATUS
-  ========================= */
-  const fetchStatus = async () => {
-    try {
-      const res = await fetch(
-        `${API}/study-groups/${id}/join-request-status`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      if (!res.ok) throw new Error("Erro ao buscar status");
-
-      const data = await res.json();
-      setStatus(data.status || "NONE");
-    } catch (err) {
-      console.log("fetchStatus error:", err);
-    }
-  };
+    loadData();
+  }, [id]);
 
   /* =========================
      JOIN REQUEST
@@ -65,42 +43,21 @@ export default function GroupDetails() {
     setSending(true);
 
     try {
-      const res = await fetch(
-        `${API}/study-groups/${id}/join-request`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
+      const { data } = await api.post(
+        `/groups/study-groups/${id}/join-request`
       );
 
-      const data = await res.json();
+      setStatus(data.status || "PENDING");
 
-      if (data.success || data.status) {
-        setStatus(data.status || "PENDING");
-      }
     } catch (err) {
-      console.log("handleJoin error:", err);
+      console.log("Erro ao entrar no grupo:", err);
+    } finally {
+      setSending(false);
     }
-
-    setSending(false);
   };
 
   /* =========================
-     LOAD DATA
-  ========================= */
-  useEffect(() => {
-    setLoading(true);
-
-    Promise.all([fetchGroup(), fetchStatus()]).finally(() =>
-      setLoading(false)
-    );
-  }, [id]);
-
-  /* =========================
-     BUTTON STATUS
+     BOTÃO DINÂMICO
   ========================= */
   const renderButton = () => {
     if (status === "ACCEPTED") {
@@ -143,29 +100,46 @@ export default function GroupDetails() {
   };
 
   /* =========================
-     RENDER
+     UI
   ========================= */
-  if (loading) return <p style={styles.loading}>Carregando...</p>;
+  if (loading) {
+    return <p style={styles.loading}>Carregando...</p>;
+  }
 
-  if (!group) return <p>Grupo não encontrado</p>;
+  if (!group) {
+    return (
+      <div style={styles.container}>
+        <p>Grupo não encontrado</p>
+
+        <button onClick={() => navigate("/groups")}>
+          Voltar
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>{group.subject}</h1>
 
-        <p style={styles.label}>📘 Objetivo:</p>
-        <p>{group.objective}</p>
+        {/* BACK BUTTON */}
+        <button
+          onClick={() => navigate("/groups")}
+          style={{ marginBottom: 15 }}
+        >
+          ⬅ Voltar
+        </button>
 
-        <p style={styles.label}>🌍 Tipo:</p>
-        <p>{group.locationType}</p>
+        <h1>{group.subject}</h1>
 
-        <p style={styles.label}>👥 Limite:</p>
-        <p>{group.participantLimit}</p>
+        <p><strong>Objetivo:</strong> {group.objective}</p>
+        <p><strong>Tipo:</strong> {group.locationType}</p>
+        <p><strong>Limite:</strong> {group.participantLimit}</p>
 
         <div style={{ marginTop: 20 }}>
           {renderButton()}
         </div>
+
       </div>
     </div>
   );
@@ -189,15 +163,6 @@ const styles = {
     borderRadius: 12,
     boxShadow: "0px 4px 15px rgba(0,0,0,0.1)",
     background: "#fff"
-  },
-
-  title: {
-    marginBottom: 20
-  },
-
-  label: {
-    fontWeight: "bold",
-    marginTop: 10
   },
 
   primaryBtn: {

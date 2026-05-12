@@ -8,14 +8,10 @@ export default function Groups() {
 
   const navigate = useNavigate();
 
-  /* =========================
-     CARREGAR GRUPOS
-  ========================= */
   useEffect(() => {
     const loadGroups = async () => {
       try {
         const res = await api.get("/groups/study-groups");
-
         setGroups(res.data.groups || []);
       } catch (err) {
         console.log("Erro ao buscar grupos:", err);
@@ -27,9 +23,6 @@ export default function Groups() {
     loadGroups();
   }, []);
 
-  /* =========================
-     UI
-  ========================= */
   if (loading) {
     return <p style={styles.loading}>Carregando grupos...</p>;
   }
@@ -37,12 +30,20 @@ export default function Groups() {
   return (
     <div style={styles.container}>
 
-      <h1 style={styles.title}>📚 Grupos de Estudo</h1>
+      {/* HEADER */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>📚 Grupos de Estudo</h1>
+
+        <button
+          style={styles.backButton}
+          onClick={() => navigate("/dashboard")}
+        >
+          ⬅ Voltar
+        </button>
+      </div>
 
       {groups.length === 0 ? (
-        <p style={styles.empty}>
-          Nenhum grupo encontrado.
-        </p>
+        <p style={styles.empty}>Nenhum grupo encontrado.</p>
       ) : (
         <div style={styles.grid}>
           {groups.map((group) => (
@@ -51,30 +52,18 @@ export default function Groups() {
               style={styles.card}
               onClick={() => navigate(`/groups/${group.id}`)}
             >
+              <h2 style={styles.subject}>{group.subject}</h2>
 
-              <h2 style={styles.subject}>
-                {group.subject}
-              </h2>
-
-              <p style={styles.text}>
-                {group.objective}
-              </p>
+              <p style={styles.text}>{group.objective}</p>
 
               <div style={styles.footer}>
-                <span>
-                  🌍 {group.locationType}
-                </span>
-
-                <span>
-                  👥 {group.participantLimit}
-                </span>
+                <span>🌍 {group.locationType}</span>
+                <span>👥 {group.participantLimit}</span>
               </div>
-
             </div>
           ))}
         </div>
       )}
-
     </div>
   );
 }
@@ -83,7 +72,6 @@ export default function Groups() {
    STYLES
 ========================= */
 const styles = {
-
   container: {
     padding: 30,
     fontFamily: "Arial",
@@ -91,8 +79,25 @@ const styles = {
     minHeight: "100vh"
   },
 
-  title: {
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20
+  },
+
+  title: {
+    margin: 0
+  },
+
+  backButton: {
+    padding: "10px 15px",
+    border: "none",
+    borderRadius: 8,
+    background: "#007bff",
+    color: "#fff",
+    cursor: "pointer",
+    fontWeight: "bold"
   },
 
   loading: {
