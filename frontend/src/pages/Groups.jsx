@@ -20,6 +20,32 @@ export default function Groups() {
       }
     };
 
+    const cancelarSolicitacao = async (groupId) => {
+      try {
+        await api.delete(
+          `/groups/${groupId}/join-request`
+        );
+
+        setGroups((prev) =>
+          prev.map((group) =>
+            group.id === groupId
+              ? {
+                ...group,
+                status: "cancelado",
+              }
+              : group
+          )
+        );
+
+        alert("Solicitação cancelada!");
+
+      } catch (error) {
+        console.log(error);
+
+        alert("Erro ao cancelar solicitação");
+      }
+    };
+
     loadGroups();
   }, []);
 
@@ -57,6 +83,18 @@ export default function Groups() {
               <p style={styles.text}>{group.objective}</p>
 
               <div style={styles.footer}>
+                {group.status === "pendente" && (
+                  <button
+                    style={styles.cancelButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      cancelarSolicitacao(group.id);
+                    }}
+                  >
+                    Cancelar solicitação
+                  </button>
+                )}
                 <span>🌍 {group.locationType}</span>
                 <span>👥 {group.participantLimit}</span>
               </div>
@@ -138,5 +176,17 @@ const styles = {
     justifyContent: "space-between",
     fontSize: 14,
     color: "#777"
+  },
+
+  cancelButton: {
+    marginTop: 15,
+    padding: "10px",
+    border: "none",
+    borderRadius: 8,
+    background: "#dc3545",
+    color: "#fff",
+    cursor: "pointer",
+    width: "100%",
+    fontWeight: "bold"
   }
 };

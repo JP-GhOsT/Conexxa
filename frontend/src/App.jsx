@@ -15,6 +15,8 @@ import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
 import GroupRequests from "./pages/GroupRequests";
 import AdminGroups from "./pages/AdminGroups";
+import RequestsPanel from "./pages/RequestsPanel";
+
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -69,16 +71,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-  
+
         {/* GROUP REQUESTS */}
-          <Route
-            path="/groups/:id/requests"
-            element={
-              <ProtectedRoute>
-                <GroupRequests />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/groups/:id/requests"
+          element={
+            <ProtectedRoute>
+              <GroupRequests />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/admin/groups"
@@ -111,6 +113,11 @@ function App() {
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/login" />} />
+
+        <Route
+          path="/requests"
+          element={<RequestsPanel />}
+        />
 
       </Routes>
     </BrowserRouter>
