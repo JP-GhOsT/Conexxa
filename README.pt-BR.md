@@ -1,27 +1,39 @@
-# Conexxa — Plataforma de Grupos de Estudo
+# 🚀 Conexxa — Plataforma de Grupos de Estudo
 
-- 🇺🇸 English version: [English README](./README.md)
-
-Sistema full stack para criação e gerenciamento de grupos de estudo, com autenticação, solicitações de entrada e painel administrativo.
+🇺🇸 English version: [README in English](./README.md)
 
 ---
 
-## 📌 Visão Geral
+## 📌 Sobre o Projeto
 
-O Conexxa permite que estudantes criem e participem de grupos de estudo de forma organizada.
-
-Funcionalidades principais:
-- Cadastro e login de usuários (JWT)
-- Criação de grupos de estudo
-- Listagem de grupos
-- Solicitação de entrada em grupos
-- Aprovação ou rejeição de membros pelo admin
-- Painel de administração de grupos
-- Edição de grupos
+O **Conexxa** é uma plataforma full stack desenvolvida para conectar estudantes em grupos de estudo, permitindo criação, participação e gerenciamento de grupos com sistema de solicitações e administração.
 
 ---
 
-## 🧠 Tecnologias
+## 🎯 Objetivo
+
+Facilitar a organização de grupos de estudo com controle de acesso, promovendo colaboração entre estudantes.
+
+---
+
+## ⚙️ Funcionalidades
+
+### 👤 Usuário
+- Cadastro e login (JWT)
+- Visualização de grupos
+- Solicitação para entrar em grupos
+- Acompanhamento do status da solicitação
+
+### 🧑‍🏫 Administrador (criador do grupo)
+- Criar grupos de estudo
+- Editar informações do grupo
+- Visualizar solicitações
+- Aceitar ou rejeitar membros
+- Gerenciar seus próprios grupos
+
+---
+
+## 🧠 Tecnologias Utilizadas
 
 ### Frontend
 - React.js
@@ -33,62 +45,44 @@ Funcionalidades principais:
 - Node.js
 - Express
 - SQLite
-- JWT
+- JWT Authentication
 - UUID
 
 ---
 
-## 📡 API
+## 📡 API (Resumo)
 
-### Auth
-- POST /auth/register
-- POST /auth/login
+### 🔐 Autenticação
+- POST `/auth/register`
+- POST `/auth/login`
 
-### Groups
-- POST /groups/study-groups
-- GET /groups/study-groups
-- GET /groups/study-groups/:id
-- PUT /groups/study-groups/:id
+### 👥 Grupos
+- POST `/groups/study-groups`
+- GET `/groups/study-groups`
+- GET `/groups/study-groups/:id`
+- PUT `/groups/study-groups/:id`
 
-### Requests
-- POST /groups/study-groups/:groupId/join-request
-- GET /groups/study-groups/:groupId/join-request-status
-- GET /groups/study-groups/:groupId/requests
+### 📥 Solicitações
+- POST `/groups/study-groups/:groupId/join-request`
+- GET `/groups/study-groups/:groupId/join-request-status`
+- GET `/groups/study-groups/:groupId/requests`
 
-### Admin
-- GET /groups/my-admin-groups
-- PATCH /groups/study-groups/:groupId/requests/:userId/accept
-- PATCH /groups/study-groups/:groupId/requests/:userId/reject
-
----
-
-## 🧩 Funcionalidades
-
-### Usuário
-- Criar conta
-- Login
-- Visualizar grupos
-- Solicitar entrada em grupos
-- Ver status da solicitação
-
-### Admin
-- Criar grupos
-- Editar grupos
-- Ver solicitações
-- Aceitar membros
-- Rejeitar membros
+### 🛠️ Administração
+- GET `/groups/my-admin-groups`
+- PATCH `/groups/study-groups/:groupId/requests/:userId/accept`
+- PATCH `/groups/study-groups/:groupId/requests/:userId/reject`
 
 ---
 
-## 🗄️ Banco de Dados
+## 🗄️ Modelo de Dados
 
-### users
+### Users
 - id
 - nome_completo
 - email
 - senha_hash
 
-### groups
+### Groups
 - id
 - subject
 - objective
@@ -96,38 +90,63 @@ Funcionalidades principais:
 - participant_limit
 - creator_id
 
-### group_memberships
+### Group Memberships
 - id
 - group_id
 - user_id
-- status
+- status (PENDING | ACCEPTED | REJECTED)
 - created_at
 - updated_at
 
 ---
 
-## 🔐 Segurança
-- JWT Authentication
-- Middleware de proteção
-- Controle de acesso por role
+## 🧩 Arquitetura
+
+```
+Frontend (React)
+    ↓
+API REST (Express)
+    ↓
+SQLite Database
+``` id="arch1"
 
 ---
 
-## 🚀 Como rodar
+## 🔐 Segurança
 
-### Backend
+- Autenticação via JWT
+- Middleware de proteção de rotas
+- Controle de acesso por usuário e admin
+- Validação de permissões por grupo
+
+---
+
+## 🚀 Como executar o projeto
+
+### 🔧 Backend
 ```bash
 cd backend
 npm install
 node src/server.js
 ```
 
-### Frontend
+### 💻 Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+## 📊 Status do Projeto
+
+✔ Autenticação completa  
+✔ CRUD de grupos  
+✔ Sistema de solicitações  
+✔ Painel administrativo  
+✔ Edição de grupos  
+✔ Integração frontend + backend  
 
 ---
 
@@ -138,3 +157,9 @@ npm run dev
 - Robson Damasceno
 - Caio Gregório
 - Diego Mathias
+
+---
+
+## ⭐ Observação
+
+Este projeto foi desenvolvido com foco acadêmico, aplicando boas práticas de desenvolvimento full stack e arquitetura moderna de aplicações web.
