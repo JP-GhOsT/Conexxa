@@ -17,7 +17,17 @@ function EditStudyGroup() {
     api
       .get(`/groups/study-groups/${id}`)
       .then((res) => {
-        setGrupo(res.data.group);
+        const g = res.data.group;
+
+        // 🔥 NORMALIZAÇÃO (IMPORTANTE)
+        setGrupo({
+          id: g.id,
+          subject: g.subject,
+          objective: g.objective,
+          locationType: g.location_type,
+          participantLimit: g.participant_limit
+        });
+
         setLoading(false);
       })
       .catch(() => {
@@ -35,12 +45,15 @@ function EditStudyGroup() {
     try {
       const response = await api.put(
         `/groups/study-groups/${id}`,
-        grupo
+        {
+          subject: grupo.subject,
+          objective: grupo.objective,
+          locationType: grupo.locationType,
+          participantLimit: grupo.participantLimit
+        }
       );
 
-      toast.success(
-        response.data.message || "Grupo atualizado com sucesso"
-      );
+      toast.success(response.data.message || "Grupo atualizado com sucesso");
 
       navigate(`/groups/${id}`);
     } catch (err) {
@@ -58,19 +71,12 @@ function EditStudyGroup() {
     });
   };
 
-  /* =========================
-     LOADING / EMPTY
-  ========================= */
   if (loading) return <p>Carregando...</p>;
   if (!grupo) return <p>Grupo não encontrado.</p>;
 
-  /* =========================
-     UI
-  ========================= */
   return (
     <div style={styles.container}>
 
-      {/* 🔙 BOTÃO VOLTAR */}
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -125,9 +131,6 @@ function EditStudyGroup() {
   );
 }
 
-/* =========================
-   ESTILOS
-========================= */
 const styles = {
   container: {
     display: "flex",
