@@ -314,6 +314,28 @@ const rejectJoinRequest = (req, res) => {
   );
 };
 
+const getGroupRequests = (req, res) => {
+  const { groupId } = req.params;
+
+  db.all(
+    `SELECT gm.id, gm.user_id, gm.status, u.nomeCompleto, u.email
+     FROM group_memberships gm
+     JOIN users u ON u.id = gm.user_id
+     WHERE gm.group_id = ? AND gm.status = 'PENDING'`,
+    [groupId],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ message: "Erro ao buscar solicitações" });
+      }
+
+      return res.json({
+        success: true,
+        requests: rows
+      });
+    }
+  );
+};
+
 /* =========================
    EXPORT
 ========================= */
@@ -325,5 +347,6 @@ module.exports = {
   requestJoinGroup,
   getJoinRequestStatus,
   acceptJoinRequest,
-  rejectJoinRequest
+  rejectJoinRequest,
+  getGroupRequests
 };

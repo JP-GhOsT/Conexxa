@@ -9,7 +9,8 @@ const {
   requestJoinGroup,
   getJoinRequestStatus,
   acceptJoinRequest,
-  rejectJoinRequest
+  rejectJoinRequest,
+  getGroupRequests
 } = require("../controllers/studyGroupController");
 
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -53,4 +54,11 @@ router.patch(
   authMiddleware,
   rejectJoinRequest
 );
+
+router.get(
+  "/study-groups/:groupId/requests",
+  authMiddleware,
+  getGroupRequests
+);
+
 module.exports = router;
