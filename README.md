@@ -136,10 +136,11 @@ npm run dev
 
 ## 🌐 Live Demo
 
-The project is deployed on **Render** and can be accessed through the following links:
+The project is deployed on **Render**. A complementary repository is also available, containing visual documentation and GIF demonstrations of the main features.
 
 - **Frontend:** [https://conexxa-1.onrender.com/](https://conexxa-1.onrender.com/)
 - **Backend:** [https://conexxa-eemn.onrender.com/](https://conexxa-eemn.onrender.com/)
+- **Documentation and demonstrations:** [Conexxa Docs](https://github.com/JP-GhOsT/Conexxa-Docs) — project documentation featuring GIFs showcasing its main functionalities.
 
 ---
 
