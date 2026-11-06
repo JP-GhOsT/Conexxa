@@ -102,13 +102,13 @@ Facilitar a organização de grupos de estudo com controle de acesso, promovendo
 
 ## 🧩 Arquitetura
 
-```
+```text
 Frontend (React)
     ↓
 API REST (Express)
     ↓
 SQLite Database
-``` id="arch1"
+```
 
 ---
 
@@ -139,6 +139,15 @@ npm run dev
 
 ---
 
+## 🌐 Acesso ao Projeto
+
+O projeto está hospedado na plataforma **Render** e pode ser acessado pelos links abaixo:
+
+- **Frontend:** [https://conexxa-1.onrender.com/](https://conexxa-1.onrender.com/)
+- **Backend:** [https://conexxa-eemn.onrender.com/](https://conexxa-eemn.onrender.com/)
+
+---
+
 ## 📊 Status do Projeto
 
 ✔ Autenticação completa  
@@ -152,11 +161,11 @@ npm run dev
 
 ## 👨‍💻 Equipe
 
-- João Paulo Zimmermann Matsui - [GitHub](https://github.com/JP-GhOsT) | [Linkedin](https://linkedin.com/in/joaomatsui)
-- Gustavo Sena de Souza - [GitHub](https://github.com/gustavosena025-dotcom) | [Linkedin](https://www.linkedin.com/in/gustavo-sena-ads-ia/)
-- Robson dos Santos Damasceno Lisboa - [GitHub](https://github.com/RobsonDamsceno) | [Linkedin](https://www.linkedin.com/in/robson-damasceno-b35954356/)
-- Caio dos Santos Gregorio da Rocha - [GitHub](https://github.com/caioogregorio) | [Linkedin](https://www.linkedin.com/in/caioogregorio/)
-- Diego Mathias da Fonseca - [GitHub](https://github.com/diegomathiasdev) | [Linkedin](https://www.linkedin.com/in/diegomathiasdafonseca/)
+- João Paulo Zimmermann Matsui - [GitHub](https://github.com/JP-GhOsT) | [LinkedIn](https://linkedin.com/in/joaomatsui)
+- Gustavo Sena de Souza - [GitHub](https://github.com/gustavosena025-dotcom) | [LinkedIn](https://www.linkedin.com/in/gustavo-sena-ads-ia/)
+- Robson dos Santos Damasceno Lisboa - [GitHub](https://github.com/RobsonDamsceno) | [LinkedIn](https://www.linkedin.com/in/robson-damasceno-b35954356/)
+- Caio dos Santos Gregorio da Rocha - [GitHub](https://github.com/caioogregorio) | [LinkedIn](https://www.linkedin.com/in/caioogregorio/)
+- Diego Mathias da Fonseca - [GitHub](https://github.com/diegomathiasdev) | [LinkedIn](https://www.linkedin.com/in/diegomathiasdafonseca/)
 
 ---
 
@@ -166,7 +175,7 @@ Este projeto foi desenvolvido com foco acadêmico, aplicando boas práticas de d
 
 ---
 
-**Project:** Conexxa
-**Platform:** Azure DevOps
+**Project:** Conexxa  
+**Platform:** Azure DevOps  
+**Hosting:** Render  
 **Integration:** Azure DevOps MCP + AI Assistant
-
