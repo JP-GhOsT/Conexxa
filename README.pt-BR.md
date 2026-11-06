@@ -141,10 +141,11 @@ npm run dev
 
 ## 🌐 Acesso ao Projeto
 
-O projeto está hospedado na plataforma **Render** e pode ser acessado pelos links abaixo:
+O projeto está hospedado na plataforma **Render**. Também está disponível um repositório complementar com a documentação visual e demonstrações em GIF das principais funcionalidades.
 
 - **Frontend:** [https://conexxa-1.onrender.com/](https://conexxa-1.onrender.com/)
 - **Backend:** [https://conexxa-eemn.onrender.com/](https://conexxa-eemn.onrender.com/)
+- **Documentação e demonstrações:** [Conexxa Docs](https://github.com/JP-GhOsT/Conexxa-Docs) — documentação do projeto com GIFs apresentando suas funcionalidades.
 
 ---
 
