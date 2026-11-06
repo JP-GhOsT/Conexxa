@@ -107,6 +107,7 @@ Main features:
 ---
 
 ## 🔐 Security
+
 - JWT Authentication
 - Protected routes middleware
 - Role-based access control
@@ -116,6 +117,7 @@ Main features:
 ## 🚀 Run project
 
 ### Backend
+
 ```bash
 cd backend
 npm install
@@ -123,6 +125,7 @@ node src/server.js
 ```
 
 ### Frontend
+
 ```bash
 cd frontend
 npm install
@@ -131,25 +134,33 @@ npm run dev
 
 ---
 
+## 🌐 Live Demo
 
-## Contributors
+The project is deployed on **Render** and can be accessed through the following links:
 
-- João Paulo Zimmermann Matsui - [GitHub](https://github.com/JP-GhOsT) | [Linkedin](https://linkedin.com/in/joaomatsui)
-- Gustavo Sena de Souza - [GitHub](https://github.com/gustavosena025-dotcom) | [Linkedin](https://www.linkedin.com/in/gustavo-sena-ads-ia/)
-- Robson dos Santos Damasceno Lisboa - [GitHub](https://github.com/RobsonDamsceno) | [Linkedin](https://www.linkedin.com/in/robson-damasceno-b35954356/)
-- Caio dos Santos Gregorio da Rocha - [GitHub](https://github.com/caioogregorio) | [Linkedin](https://www.linkedin.com/in/caioogregorio/)
-- Diego Mathias da Fonseca - [GitHub](https://github.com/diegomathiasdev) | [Linkedin](https://www.linkedin.com/in/diegomathiasdafonseca/)
+- **Frontend:** [https://conexxa-1.onrender.com/](https://conexxa-1.onrender.com/)
+- **Backend:** [https://conexxa-eemn.onrender.com/](https://conexxa-eemn.onrender.com/)
 
+---
+
+## 👨‍💻 Contributors
+
+- João Paulo Zimmermann Matsui - [GitHub](https://github.com/JP-GhOsT) | [LinkedIn](https://linkedin.com/in/joaomatsui)
+- Gustavo Sena de Souza - [GitHub](https://github.com/gustavosena025-dotcom) | [LinkedIn](https://www.linkedin.com/in/gustavo-sena-ads-ia/)
+- Robson dos Santos Damasceno Lisboa - [GitHub](https://github.com/RobsonDamsceno) | [LinkedIn](https://www.linkedin.com/in/robson-damasceno-b35954356/)
+- Caio dos Santos Gregorio da Rocha - [GitHub](https://github.com/caioogregorio) | [LinkedIn](https://www.linkedin.com/in/caioogregorio/)
+- Diego Mathias da Fonseca - [GitHub](https://github.com/diegomathiasdev) | [LinkedIn](https://www.linkedin.com/in/diegomathiasdafonseca/)
 
 ---
 
 ## 📌 Project Info
 
-- **Project:** Conexxa  
-- **Type:** Full-stack academic project  
-- **Stack:** React + Node.js + SQLite  
-- **Architecture:** REST API + JWT Authentication  
-- **Integration:** Azure DevOps MCP + AI Assistant  
+- **Project:** Conexxa
+- **Type:** Full-stack academic project
+- **Stack:** React + Node.js + SQLite
+- **Architecture:** REST API + JWT Authentication
+- **Hosting:** Render
+- **Integration:** Azure DevOps MCP + AI Assistant
 
 ---
 
@@ -159,6 +170,7 @@ This project demonstrates practical full-stack development skills, including aut
 
 ---
 
-**Project:** Conexxa
-**Platform:** Azure DevOps
+**Project:** Conexxa  
+**Platform:** Azure DevOps  
+**Hosting:** Render  
 **Integration:** Azure DevOps MCP + AI Assistant
